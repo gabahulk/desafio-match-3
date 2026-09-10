@@ -16,27 +16,7 @@ namespace Gazeus.DesafioMatch3.Core
 
             (newBoard[toY][toX], newBoard[fromY][fromX]) = (newBoard[fromY][fromX], newBoard[toY][toX]);
 
-            for (int y = 0; y < newBoard.Count; y++)
-            {
-                for (int x = 0; x < newBoard[y].Count; x++)
-                {
-                    if (x > 1 &&
-                        newBoard[y][x].Type == newBoard[y][x - 1].Type &&
-                        newBoard[y][x - 1].Type == newBoard[y][x - 2].Type)
-                    {
-                        return true;
-                    }
-
-                    if (y > 1 &&
-                        newBoard[y][x].Type == newBoard[y - 1][x].Type &&
-                        newBoard[y - 1][x].Type == newBoard[y - 2][x].Type)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return MatchFinder.HasMatch(MatchFinder.FindMatches(newBoard));
         }
 
         public List<List<Tile>> StartGame(int boardWidth, int boardHeight)
@@ -54,9 +34,9 @@ namespace Gazeus.DesafioMatch3.Core
             (newBoard[toY][toX], newBoard[fromY][fromX]) = (newBoard[fromY][fromX], newBoard[toY][toX]);
 
             List<BoardSequence> boardSequences = new();
-            List<List<bool>> matchedTiles = FindMatches(newBoard);
+            List<List<bool>> matchedTiles = MatchFinder.FindMatches(newBoard);
 
-            while (HasMatch(matchedTiles))
+            while (MatchFinder.HasMatch(matchedTiles))
             {
                 //Cleaning the matched tiles
                 List<Vector2Int> matchedPosition = new();
@@ -140,7 +120,7 @@ namespace Gazeus.DesafioMatch3.Core
                     AddedTiles = addedTiles
                 };
                 boardSequences.Add(sequence);
-                matchedTiles = FindMatches(newBoard);
+                matchedTiles = MatchFinder.FindMatches(newBoard);
             }
 
             _boardTiles = newBoard;
@@ -207,59 +187,5 @@ namespace Gazeus.DesafioMatch3.Core
             return board;
         }
 
-        private static List<List<bool>> FindMatches(List<List<Tile>> newBoard)
-        {
-            List<List<bool>> matchedTiles = new();
-            for (int y = 0; y < newBoard.Count; y++)
-            {
-                matchedTiles.Add(new List<bool>(newBoard[y].Count));
-                for (int x = 0; x < newBoard[y].Count; x++)
-                {
-                    matchedTiles[y].Add(false);
-                }
-            }
-
-            for (int y = 0; y < newBoard.Count; y++)
-            {
-                for (int x = 0; x < newBoard[y].Count; x++)
-                {
-                    if (x > 1 &&
-                        newBoard[y][x].Type == newBoard[y][x - 1].Type &&
-                        newBoard[y][x - 1].Type == newBoard[y][x - 2].Type)
-                    {
-                        matchedTiles[y][x] = true;
-                        matchedTiles[y][x - 1] = true;
-                        matchedTiles[y][x - 2] = true;
-                    }
-
-                    if (y > 1 &&
-                        newBoard[y][x].Type == newBoard[y - 1][x].Type &&
-                        newBoard[y - 1][x].Type == newBoard[y - 2][x].Type)
-                    {
-                        matchedTiles[y][x] = true;
-                        matchedTiles[y - 1][x] = true;
-                        matchedTiles[y - 2][x] = true;
-                    }
-                }
-            }
-
-            return matchedTiles;
-        }
-
-        private static bool HasMatch(List<List<bool>> list)
-        {
-            for (int y = 0; y < list.Count; y++)
-            {
-                for (int x = 0; x < list[y].Count; x++)
-                {
-                    if (list[y][x])
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
     }
 }
