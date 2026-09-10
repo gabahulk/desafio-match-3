@@ -99,22 +99,39 @@ Do not introduce new gameplay architecture ahead of the current task.
 
 ## Testing
 
-The automated test infrastructure will be introduced incrementally.
+Run the automated Edit Mode test suite with:
 
-Until the test suite is available:
+```powershell
+powershell -ExecutionPolicy Bypass -File Tools/run-tests.ps1
+```
 
-- the project must compile without new errors;
-- do not claim automated validation that was not actually run;
-- report manual validation performed;
-- report anything that could not be validated.
+For any ticket that changes C# gameplay or test code, run this command before
+considering the ticket complete.
 
-Once automated tests are introduced:
-
-- all relevant existing tests must pass before a task is considered complete;
+- all existing automated tests must pass;
+- do not claim validation that was not actually executed;
+- if tests cannot run, report the reason and do not treat the ticket as
+  successfully completed;
 - bug fixes should include regression coverage when practical;
 - gameplay-rule changes should include deterministic tests;
 - do not modify tests simply to make a failing implementation pass unless the
   expected behavior itself has intentionally changed.
+
+## Commit policy
+
+After a ticket is fully implemented, reviewed against its acceptance criteria,
+and all required validation passes, create one focused Git commit for that
+ticket.
+
+- do not commit a failed or partially validated ticket;
+- keep the commit limited to files relevant to the current ticket;
+- do not include unrelated local changes;
+- do not rewrite or squash unrelated history;
+- use a concise commit message describing the completed change;
+- after committing, report the commit hash and message.
+
+Future tickets should follow this rule automatically unless explicitly told
+not to commit.
 
 ## Validation and reporting
 
