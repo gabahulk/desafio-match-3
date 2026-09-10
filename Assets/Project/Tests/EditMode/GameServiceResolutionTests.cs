@@ -126,6 +126,27 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(2, 3));
         }
 
+        [Test]
+        public void SwapTile_OnWideRectangularBoard_ResolvesHorizontalMatch()
+        {
+            var service = new GameService();
+            var board = service.StartGame(5, 3);
+            BoardFixture.Apply(
+                board,
+                "RGBYG",
+                "GBYGR",
+                "BYRRG"
+            );
+
+            List<BoardSequence> sequences = SwapDeterministically(service, 4, 1, 4, 2);
+
+            AssertFirstMatchedPositions(
+                sequences,
+                new Vector2Int(2, 2),
+                new Vector2Int(3, 2),
+                new Vector2Int(4, 2));
+        }
+
         private static List<BoardSequence> SwapDeterministically(
             GameService service,
             int fromX,

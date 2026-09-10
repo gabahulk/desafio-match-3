@@ -213,7 +213,7 @@ namespace Gazeus.DesafioMatch3.Core
             for (int y = 0; y < newBoard.Count; y++)
             {
                 matchedTiles.Add(new List<bool>(newBoard[y].Count));
-                for (int x = 0; x < newBoard.Count; x++)
+                for (int x = 0; x < newBoard[y].Count; x++)
                 {
                     matchedTiles[y].Add(false);
                 }
