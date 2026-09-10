@@ -23,6 +23,24 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
+        public void StartGame_AssignsSequentialTileIdsStartingAtZero()
+        {
+            var service = new GameService();
+
+            List<List<Tile>> board = service.StartGame(4, 3);
+
+            int expectedId = 0;
+            foreach (List<Tile> row in board)
+            {
+                foreach (Tile tile in row)
+                {
+                    Assert.That(tile.Id, Is.EqualTo(expectedId));
+                    expectedId++;
+                }
+            }
+        }
+
+        [Test]
         public void StartGame_Repeatedly_DoesNotCreateImmediateMatches()
         {
             Random.State originalRandomState = Random.state;

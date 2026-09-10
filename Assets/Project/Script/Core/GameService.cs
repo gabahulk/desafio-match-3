@@ -22,7 +22,8 @@ namespace Gazeus.DesafioMatch3.Core
         public List<List<Tile>> StartGame(int boardWidth, int boardHeight)
         {
             _tilesTypes = new List<int> { 0, 1, 2, 3 };
-            _boardTiles = CreateBoard(boardWidth, boardHeight, _tilesTypes);
+            _boardTiles = BoardGenerator.Create(boardWidth, boardHeight, _tilesTypes);
+            _tileCount = boardWidth * boardHeight;
 
             return _boardTiles;
         }
@@ -142,49 +143,6 @@ namespace Gazeus.DesafioMatch3.Core
             }
 
             return newBoard;
-        }
-
-        private List<List<Tile>> CreateBoard(int width, int height, List<int> tileTypes)
-        {
-            List<List<Tile>> board = new(height);
-            _tileCount = 0;
-            for (int y = 0; y < height; y++)
-            {
-                board.Add(new List<Tile>(width));
-                for (int x = 0; x < width; x++)
-                {
-                    board[y].Add(new Tile { Id = -1, Type = -1 });
-                }
-            }
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    List<int> noMatchTypes = new(tileTypes.Count);
-                    for (int i = 0; i < tileTypes.Count; i++)
-                    {
-                        noMatchTypes.Add(_tilesTypes[i]);
-                    }
-
-                    if (x > 1 &&
-                        board[y][x - 1].Type == board[y][x - 2].Type)
-                    {
-                        noMatchTypes.Remove(board[y][x - 1].Type);
-                    }
-
-                    if (y > 1 &&
-                        board[y - 1][x].Type == board[y - 2][x].Type)
-                    {
-                        noMatchTypes.Remove(board[y - 1][x].Type);
-                    }
-
-                    board[y][x].Id = _tileCount++;
-                    board[y][x].Type = noMatchTypes[Random.Range(0, noMatchTypes.Count)];
-                }
-            }
-
-            return board;
         }
 
     }
