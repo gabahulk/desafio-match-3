@@ -12,8 +12,8 @@ namespace Gazeus.DesafioMatch3.Core
             SpecialSpawnContext context,
             IReadOnlyCollection<Vector2Int> alreadyProtectedCells)
         {
-            // Other semantically eligible shapes are reserved for specials whose gameplay
-            // is not implemented yet. Currently only a Straight-4 maps to a concrete special.
+            // Straight-5 remains semantically eligible but has no concrete mapping until
+            // Color Bomb gameplay is implemented.
             if (!TryGetSpecialType(pattern, context, out SpecialType special))
             {
                 return new SpecialCreationResult(
@@ -59,6 +59,14 @@ namespace Gazeus.DesafioMatch3.Core
                 special = context.IsPlayerSwap
                     ? GetSwapStripedType(context.SwapFrom, context.SwapTo)
                     : GetPatternStripedType(pattern);
+                return true;
+            }
+
+            if (pattern.Shape == MatchShape.L ||
+                pattern.Shape == MatchShape.T ||
+                pattern.Shape == MatchShape.Cross)
+            {
+                special = SpecialType.Wrapped;
                 return true;
             }
 

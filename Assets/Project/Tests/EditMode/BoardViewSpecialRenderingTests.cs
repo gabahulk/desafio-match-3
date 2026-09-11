@@ -12,7 +12,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
     public sealed class BoardViewSpecialRenderingTests
     {
         [Test]
-        public void CreateBoardAndApplyCreatedSpecials_RenderStripedOverlays()
+        public void CreateBoardAndApplyCreatedSpecials_RenderSpecialOverlays()
         {
             GameObject root = new("Board View Test Root", typeof(RectTransform));
             GameObject tileSpotObject = new("Tile Spot", typeof(RectTransform), typeof(Button));
@@ -37,7 +37,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 boardViewData.FindProperty("_tileSpotPrefab").objectReferenceValue = tileSpot;
                 boardViewData.ApplyModifiedPropertiesWithoutUndo();
 
-                Board board = new(2, 1);
+                Board board = new(3, 1);
                 board[0, 0] = new Tile
                 {
                     Id = 0,
@@ -50,10 +50,19 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                     Color = 0,
                     Special = SpecialType.None
                 };
+                board[2, 0] = new Tile
+                {
+                    Id = 2,
+                    Color = 0,
+                    Special = SpecialType.Wrapped
+                };
 
                 boardView.CreateBoard(board);
                 Assert.That(
                     FindDescendant(root.transform, "HorizontalStriped Overlay"),
+                    Is.Not.Null);
+                Assert.That(
+                    FindDescendant(root.transform, "Wrapped Overlay"),
                     Is.Not.Null);
 
                 boardView.ApplyCreatedSpecials(new List<SpecialTileInfo>

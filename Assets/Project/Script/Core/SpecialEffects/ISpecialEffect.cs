@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Gazeus.DesafioMatch3.Models;
 using UnityEngine;
 
@@ -8,9 +7,9 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
     {
         bool CanHandle(SpecialType special);
 
-        void Expand(
+        SpecialActivationResult Activate(
             Board board,
             Vector2Int position,
-            List<Vector2Int> affectedCells);
+            SpecialActivationPhase phase);
     }
 }

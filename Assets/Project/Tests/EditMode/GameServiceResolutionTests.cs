@@ -111,7 +111,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
-        public void TrySwap_WhenSwapCreatesIntersectingMatches_FirstSequenceContainsUnionWithoutDuplicates()
+        public void TrySwap_WhenSwapCreatesIntersectingMatches_CreatesWrappedAndDestroysRemainingUnion()
         {
             Board board = BoardFixture.Create(
                 "RGBYR",
@@ -129,8 +129,12 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(2, 1),
                 new Vector2Int(0, 2),
                 new Vector2Int(1, 2),
-                new Vector2Int(2, 2),
                 new Vector2Int(2, 3));
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles, Has.Count.EqualTo(1));
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles[0].Position,
+                Is.EqualTo(new Vector2Int(2, 2)));
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles[0].Special,
+                Is.EqualTo(SpecialType.Wrapped));
         }
 
         [Test]

@@ -12,11 +12,12 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
                    special == SpecialType.VerticalStriped;
         }
 
-        public void Expand(
+        public SpecialActivationResult Activate(
             Board board,
             Vector2Int position,
-            List<Vector2Int> affectedCells)
+            SpecialActivationPhase phase)
         {
+            List<Vector2Int> affectedCells = new();
             SpecialType special = board[position.x, position.y].Special;
             if (special == SpecialType.HorizontalStriped)
             {
@@ -32,6 +33,8 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
                     affectedCells.Add(new Vector2Int(position.x, y));
                 }
             }
+
+            return new SpecialActivationResult(affectedCells, false, null);
         }
     }
 }

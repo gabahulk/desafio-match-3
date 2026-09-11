@@ -141,15 +141,25 @@ namespace Gazeus.DesafioMatch3.Views
 
         private static void ApplySpecialVisual(GameObject tile, SpecialType special)
         {
-            if (tile == null ||
-                (special != SpecialType.HorizontalStriped &&
-                 special != SpecialType.VerticalStriped))
+            if (tile == null || special == SpecialType.None)
             {
                 return;
             }
 
             string overlayName = $"{special} Overlay";
             if (tile.transform.Find(overlayName) != null)
+            {
+                return;
+            }
+
+            if (special == SpecialType.Wrapped)
+            {
+                CreateWrappedOverlay(tile, overlayName);
+                return;
+            }
+
+            if (special != SpecialType.HorizontalStriped &&
+                special != SpecialType.VerticalStriped)
             {
                 return;
             }
@@ -175,6 +185,41 @@ namespace Gazeus.DesafioMatch3.Views
             Image stripe = overlay.GetComponent<Image>();
             stripe.color = new Color(1.0f, 1.0f, 1.0f, 0.85f);
             stripe.raycastTarget = false;
+        }
+
+        private static void CreateWrappedOverlay(GameObject tile, string overlayName)
+        {
+            GameObject overlay = new(overlayName, typeof(RectTransform));
+            RectTransform overlayRect = (RectTransform)overlay.transform;
+            overlayRect.SetParent(tile.transform, false);
+            overlayRect.anchorMin = Vector2.zero;
+            overlayRect.anchorMax = Vector2.one;
+            overlayRect.offsetMin = Vector2.zero;
+            overlayRect.offsetMax = Vector2.zero;
+
+            CreateWrappedEdge(overlayRect, "Top", new Vector2(0.08f, 0.78f), new Vector2(0.92f, 0.92f));
+            CreateWrappedEdge(overlayRect, "Bottom", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.22f));
+            CreateWrappedEdge(overlayRect, "Left", new Vector2(0.08f, 0.22f), new Vector2(0.22f, 0.78f));
+            CreateWrappedEdge(overlayRect, "Right", new Vector2(0.78f, 0.22f), new Vector2(0.92f, 0.78f));
+        }
+
+        private static void CreateWrappedEdge(
+            RectTransform parent,
+            string name,
+            Vector2 anchorMin,
+            Vector2 anchorMax)
+        {
+            GameObject edge = new(name, typeof(RectTransform), typeof(Image));
+            RectTransform edgeRect = (RectTransform)edge.transform;
+            edgeRect.SetParent(parent, false);
+            edgeRect.anchorMin = anchorMin;
+            edgeRect.anchorMax = anchorMax;
+            edgeRect.offsetMin = Vector2.zero;
+            edgeRect.offsetMax = Vector2.zero;
+
+            Image image = edge.GetComponent<Image>();
+            image.color = new Color(1.0f, 0.72f, 0.15f, 0.95f);
+            image.raycastTarget = false;
         }
 
         #region Events

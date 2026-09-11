@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Gazeus.DesafioMatch3.Core.SpecialEffects;
 using Gazeus.DesafioMatch3.Models;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -62,35 +63,58 @@ namespace Gazeus.DesafioMatch3.Core
             SpecialSpawnContext context)
         {
             List<BoardSequence> boardSequences = new();
+            IReadOnlyList<PendingSpecialActivation> pendingActivations =
+                Array.Empty<PendingSpecialActivation>();
 
-            while (patterns.Count > 0)
+            while (patterns.Count > 0 || pendingActivations.Count > 0)
             {
                 List<SpecialTileInfo> createdSpecialTiles = new();
                 HashSet<Vector2Int> protectedCells = new();
-                for (int patternIndex = 0; patternIndex < patterns.Count; patternIndex++)
+                if (pendingActivations.Count == 0)
                 {
-                    MatchPattern pattern = patterns[patternIndex];
-                    if (!pattern.CreatesSpecial)
+                    for (int patternIndex = 0; patternIndex < patterns.Count; patternIndex++)
                     {
-                        continue;
-                    }
+                        MatchPattern pattern = patterns[patternIndex];
+                        if (!pattern.CreatesSpecial)
+                        {
+                            continue;
+                        }
 
-                    SpecialCreationResult creation = SpecialCreator.Create(
-                        board,
-                        pattern,
-                        context,
-                        protectedCells);
-                    createdSpecialTiles.AddRange(creation.CreatedSpecialTiles);
-                    protectedCells.UnionWith(creation.ProtectedCells);
+                        SpecialCreationResult creation = SpecialCreator.Create(
+                            board,
+                            pattern,
+                            context,
+                            protectedCells);
+                        createdSpecialTiles.AddRange(creation.CreatedSpecialTiles);
+                        protectedCells.UnionWith(creation.ProtectedCells);
+                    }
                 }
 
-                HashSet<Vector2Int> destructionCells = BuildMatchedCells(
-                    patterns,
-                    protectedCells);
-                destructionCells = SpecialEffectResolver.Expand(
-                    board,
-                    destructionCells,
-                    protectedCells);
+                SpecialEffectResolution effectResolution;
+                if (pendingActivations.Count > 0)
+                {
+                    effectResolution = SpecialEffectResolver.ResolvePending(
+                        board,
+                        pendingActivations);
+                }
+                else
+                {
+                    HashSet<Vector2Int> matchedCells = BuildMatchedCells(
+                        patterns,
+                        protectedCells);
+                    effectResolution = SpecialEffectResolver.Expand(
+                        board,
+                        matchedCells,
+                        protectedCells);
+                }
+
+                HashSet<Vector2Int> destructionCells = effectResolution.DestructionCells;
+                pendingActivations = effectResolution.PendingActivations;
+                if (destructionCells.Count == 0)
+                {
+                    patterns = MatchFinder.FindMatches(board);
+                    continue;
+                }
 
                 List<Vector2Int> matchedPosition = new(destructionCells.Count);
                 for (int y = 0; y < board.Height; y++)
@@ -183,7 +207,9 @@ namespace Gazeus.DesafioMatch3.Core
                 };
                 boardSequences.Add(sequence);
                 context = SpecialSpawnContext.FromCascade(movedTilesList, addedTiles);
-                patterns = MatchFinder.FindMatches(board);
+                patterns = pendingActivations.Count > 0
+                    ? Array.Empty<MatchPattern>()
+                    : MatchFinder.FindMatches(board);
             }
 
             return boardSequences;
