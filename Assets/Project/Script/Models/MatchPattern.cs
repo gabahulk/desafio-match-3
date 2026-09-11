@@ -1,0 +1,41 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Gazeus.DesafioMatch3.Models
+{
+    public sealed class MatchPattern
+    {
+        public int TileType { get; }
+        public MatchShape Shape { get; }
+        public IReadOnlyList<Vector2Int> Cells { get; }
+        public int Size => Cells.Count;
+
+        internal MatchPattern(
+            int tileType,
+            MatchShape shape,
+            IReadOnlyList<Vector2Int> cells)
+        {
+            if (cells == null)
+            {
+                throw new ArgumentNullException(nameof(cells));
+            }
+
+            TileType = tileType;
+            Shape = shape;
+
+            HashSet<Vector2Int> uniqueCells = new();
+            List<Vector2Int> cellList = new(cells.Count);
+            for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+            {
+                Vector2Int cell = cells[cellIndex];
+                if (uniqueCells.Add(cell))
+                {
+                    cellList.Add(cell);
+                }
+            }
+
+            Cells = cellList.AsReadOnly();
+        }
+    }
+}

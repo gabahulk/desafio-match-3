@@ -41,32 +41,31 @@ namespace Gazeus.DesafioMatch3.Core
             (candidateBoard[toX, toY], candidateBoard[fromX, fromY]) =
                 (candidateBoard[fromX, fromY], candidateBoard[toX, toY]);
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(candidateBoard);
-            if (matches.Count == 0)
+            IReadOnlyList<MatchPattern> patterns = MatchFinder.FindMatches(candidateBoard);
+            if (patterns.Count == 0)
             {
                 return new MoveResult(false, Array.Empty<BoardSequence>());
             }
 
-            List<BoardSequence> boardSequences = Resolve(candidateBoard, matches);
+            List<BoardSequence> boardSequences = Resolve(candidateBoard, patterns);
             _board = candidateBoard;
 
             return new MoveResult(true, boardSequences);
         }
 
-        private List<BoardSequence> Resolve(Board board, IReadOnlyList<Match> matches)
+        private List<BoardSequence> Resolve(Board board, IReadOnlyList<MatchPattern> patterns)
         {
             List<BoardSequence> boardSequences = new();
 
-            while (matches.Count > 0)
+            while (patterns.Count > 0)
             {
                 //Cleaning the matched tiles
-                IReadOnlyList<MatchGroup> matchGroups = MatchGrouper.Group(matches);
                 HashSet<Vector2Int> matchedCells = new();
-                for (int groupIndex = 0; groupIndex < matchGroups.Count; groupIndex++)
+                for (int patternIndex = 0; patternIndex < patterns.Count; patternIndex++)
                 {
-                    foreach (Vector2Int cell in matchGroups[groupIndex].Cells)
+                    for (int cellIndex = 0; cellIndex < patterns[patternIndex].Cells.Count; cellIndex++)
                     {
-                        matchedCells.Add(cell);
+                        matchedCells.Add(patterns[patternIndex].Cells[cellIndex]);
                     }
                 }
 
@@ -152,7 +151,7 @@ namespace Gazeus.DesafioMatch3.Core
                     AddedTiles = addedTiles
                 };
                 boardSequences.Add(sequence);
-                matches = MatchFinder.FindMatches(board);
+                patterns = MatchFinder.FindMatches(board);
             }
 
             return boardSequences;

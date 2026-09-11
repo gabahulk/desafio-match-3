@@ -11,84 +11,76 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
     public sealed class MatchFinderTests
     {
         [Test]
-        public void FindMatches_OnWideBoard_ReturnsHorizontalMatchThree()
+        public void FindMatches_OnWideBoard_ReturnsHorizontalStraightMatchThree()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RRRGB",
                 "GBYRG",
                 "BYGBY"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Has.Count.EqualTo(1));
-            AssertMatch(
-                matches[0],
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            AssertPattern(
+                patterns[0],
                 0,
-                MatchOrientation.Horizontal,
+                MatchShape.Straight,
                 new Vector2Int(0, 0),
                 new Vector2Int(1, 0),
                 new Vector2Int(2, 0));
         }
 
         [Test]
-        public void FindMatches_OnTallBoard_ReturnsVerticalMatchThree()
+        public void FindMatches_OnTallBoard_ReturnsVerticalStraightMatchThree()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RGB",
                 "RBY",
                 "RYG",
                 "GBR"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Has.Count.EqualTo(1));
-            AssertMatch(
-                matches[0],
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            AssertPattern(
+                patterns[0],
                 0,
-                MatchOrientation.Vertical,
+                MatchShape.Straight,
                 new Vector2Int(0, 0),
                 new Vector2Int(0, 1),
                 new Vector2Int(0, 2));
         }
 
         [Test]
-        public void FindMatches_ReturnsHorizontalMatchFourAsSingleRun()
+        public void FindMatches_ReturnsHorizontalMatchFourAsSingleStraightPattern()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RRRRG",
                 "GBYGB",
                 "BYGBY"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Has.Count.EqualTo(1));
-            Assert.That(matches[0].Orientation, Is.EqualTo(MatchOrientation.Horizontal));
-            Assert.That(matches[0].Size, Is.EqualTo(4));
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Straight));
+            Assert.That(patterns[0].Size, Is.EqualTo(4));
         }
 
         [Test]
-        public void FindMatches_ReturnsHorizontalMatchFiveAsSingleRun()
+        public void FindMatches_ReturnsHorizontalMatchFiveAsSingleStraightPattern()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RRRRR",
                 "GBYGB",
                 "BYGBY"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Has.Count.EqualTo(1));
-            Assert.That(matches[0].Orientation, Is.EqualTo(MatchOrientation.Horizontal));
-            Assert.That(matches[0].Size, Is.EqualTo(5));
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Straight));
+            Assert.That(patterns[0].Size, Is.EqualTo(5));
         }
 
         [Test]
-        public void FindMatches_ReturnsVerticalMatchFourAsSingleRun()
+        public void FindMatches_ReturnsVerticalMatchFourAsSingleStraightPattern()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RGB",
                 "RYG",
                 "RBR",
@@ -96,17 +88,15 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 "YRB"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Has.Count.EqualTo(1));
-            Assert.That(matches[0].Orientation, Is.EqualTo(MatchOrientation.Vertical));
-            Assert.That(matches[0].Size, Is.EqualTo(4));
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Straight));
+            Assert.That(patterns[0].Size, Is.EqualTo(4));
         }
 
         [Test]
-        public void FindMatches_ReturnsVerticalMatchFiveAsSingleRun()
+        public void FindMatches_ReturnsVerticalMatchFiveAsSingleStraightPattern()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RGB",
                 "RYG",
                 "RBR",
@@ -114,33 +104,81 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 "RYB"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Has.Count.EqualTo(1));
-            Assert.That(matches[0].Orientation, Is.EqualTo(MatchOrientation.Vertical));
-            Assert.That(matches[0].Size, Is.EqualTo(5));
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Straight));
+            Assert.That(patterns[0].Size, Is.EqualTo(5));
         }
 
         [Test]
-        public void FindMatches_WithIndependentRuns_ReturnsSeparateMatches()
+        public void FindMatches_WithIndependentRunsOfSameType_ReturnsSeparatePatterns()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RRRGB",
                 "GBYRG",
-                "BYYYR"
+                "BGRRR"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Has.Count.EqualTo(2));
-            Assert.That(matches.Select(match => match.TileType), Is.EquivalentTo(new[] { 0, 3 }));
-            Assert.That(matches.All(match => match.Orientation == MatchOrientation.Horizontal), Is.True);
+            Assert.That(patterns, Has.Count.EqualTo(2));
+            Assert.That(patterns.All(pattern => pattern.TileType == 0), Is.True);
+            Assert.That(patterns.All(pattern => pattern.Shape == MatchShape.Straight), Is.True);
         }
 
         [Test]
-        public void FindMatches_WithIntersection_ReturnsSeparateLinesSharingCenterCell()
+        public void FindMatches_WithEndpointIntersectionOnBothRuns_ReturnsLWithUniqueCells()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
+                "GBRGB",
+                "BYRYG",
+                "YGRRR",
+                "RGBYG"
+            );
+
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            AssertPattern(
+                patterns[0],
+                0,
+                MatchShape.L,
+                new Vector2Int(2, 0),
+                new Vector2Int(2, 1),
+                new Vector2Int(2, 2),
+                new Vector2Int(3, 2),
+                new Vector2Int(4, 2));
+        }
+
+        [Test]
+        public void FindMatches_WithVerticalEndpointAndHorizontalInteriorIntersection_ReturnsT()
+        {
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
+                "GBYGB",
+                "GRRRG",
+                "BYRBY",
+                "YGRYG",
+                "RGBYR"
+            );
+
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.T));
+        }
+
+        [Test]
+        public void FindMatches_WithHorizontalEndpointAndVerticalInteriorIntersection_ReturnsT()
+        {
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
+                "GBYGB",
+                "YBRGY",
+                "RRRYG",
+                "BYRBY",
+                "RGBYR"
+            );
+
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.T));
+        }
+
+        [Test]
+        public void FindMatches_WithInteriorIntersectionOnBothRuns_ReturnsCrossWithUniqueCells()
+        {
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "GBYGB",
                 "YBRGY",
                 "GRRRG",
@@ -148,39 +186,63 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 "RGBYR"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Cross));
+            Assert.That(patterns[0].Size, Is.EqualTo(5));
+            Assert.That(patterns[0].Cells, Is.EquivalentTo(new[]
+            {
+                new Vector2Int(1, 2),
+                new Vector2Int(2, 2),
+                new Vector2Int(3, 2),
+                new Vector2Int(2, 1),
+                new Vector2Int(2, 3)
+            }));
+        }
 
-            Assert.That(matches, Has.Count.EqualTo(2));
-            Match horizontal = matches.Single(match => match.Orientation == MatchOrientation.Horizontal);
-            Match vertical = matches.Single(match => match.Orientation == MatchOrientation.Vertical);
-            Assert.That(horizontal.Cells, Does.Contain(new Vector2Int(2, 2)));
-            Assert.That(vertical.Cells, Does.Contain(new Vector2Int(2, 2)));
+        [Test]
+        public void FindMatches_WithTransitiveIntersections_ReturnsOneComplexPattern()
+        {
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
+                "GBYGB",
+                "RRRGB",
+                "BYRYG",
+                "GBRRR",
+                "YGBYG"
+            );
+
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Complex));
+            Assert.That(patterns[0].Size, Is.EqualTo(7));
         }
 
         [Test]
         public void FindMatches_WithNoRuns_ReturnsEmptyCollection()
         {
-            Board board = BoardFixture.Create(
+            IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RGBY",
                 "GBYR",
                 "BYRG"
             );
 
-            IReadOnlyList<Match> matches = MatchFinder.FindMatches(board);
-
-            Assert.That(matches, Is.Empty);
+            Assert.That(patterns, Is.Empty);
         }
 
-        private static void AssertMatch(
-            Match match,
+        private static IReadOnlyList<MatchPattern> FindPatterns(params string[] rows)
+        {
+            Board board = BoardFixture.Create(rows);
+            return MatchFinder.FindMatches(board);
+        }
+
+        private static void AssertPattern(
+            MatchPattern pattern,
             int expectedTileType,
-            MatchOrientation expectedOrientation,
+            MatchShape expectedShape,
             params Vector2Int[] expectedCells)
         {
-            Assert.That(match.TileType, Is.EqualTo(expectedTileType));
-            Assert.That(match.Orientation, Is.EqualTo(expectedOrientation));
-            Assert.That(match.Size, Is.EqualTo(expectedCells.Length));
-            Assert.That(match.Cells, Is.EqualTo(expectedCells));
+            Assert.That(pattern.TileType, Is.EqualTo(expectedTileType));
+            Assert.That(pattern.Shape, Is.EqualTo(expectedShape));
+            Assert.That(pattern.Size, Is.EqualTo(expectedCells.Length));
+            Assert.That(pattern.Cells, Is.EquivalentTo(expectedCells));
         }
     }
 }

@@ -6,9 +6,15 @@ namespace Gazeus.DesafioMatch3.Core
 {
     public static class MatchFinder
     {
-        public static IReadOnlyList<Match> FindMatches(Board board)
+        public static IReadOnlyList<MatchPattern> FindMatches(Board board)
         {
-            List<Match> matches = new();
+            List<MatchRun> runs = FindRuns(board);
+            return GroupRuns(runs);
+        }
+
+        private static List<MatchRun> FindRuns(Board board)
+        {
+            List<MatchRun> runs = new();
 
             for (int y = 0; y < board.Height; y++)
             {
@@ -33,7 +39,7 @@ namespace Gazeus.DesafioMatch3.Core
                             cells.Add(new Vector2Int(runX, y));
                         }
 
-                        matches.Add(new Match(tileType, MatchOrientation.Horizontal, cells));
+                        runs.Add(new MatchRun(tileType, RunOrientation.Horizontal, cells));
                     }
                 }
             }
@@ -61,12 +67,169 @@ namespace Gazeus.DesafioMatch3.Core
                             cells.Add(new Vector2Int(x, runY));
                         }
 
-                        matches.Add(new Match(tileType, MatchOrientation.Vertical, cells));
+                        runs.Add(new MatchRun(tileType, RunOrientation.Vertical, cells));
                     }
                 }
             }
 
-            return matches;
+            return runs;
+        }
+
+        private static IReadOnlyList<MatchPattern> GroupRuns(IReadOnlyList<MatchRun> runs)
+        {
+            List<MatchPattern> patterns = new();
+            bool[] groupedRuns = new bool[runs.Count];
+
+            for (int runIndex = 0; runIndex < runs.Count; runIndex++)
+            {
+                if (groupedRuns[runIndex])
+                {
+                    continue;
+                }
+
+                List<MatchRun> patternRuns = new();
+                Queue<int> runsToVisit = new();
+                groupedRuns[runIndex] = true;
+                runsToVisit.Enqueue(runIndex);
+
+                while (runsToVisit.Count > 0)
+                {
+                    int currentIndex = runsToVisit.Dequeue();
+                    MatchRun currentRun = runs[currentIndex];
+                    patternRuns.Add(currentRun);
+
+                    for (int candidateIndex = 0; candidateIndex < runs.Count; candidateIndex++)
+                    {
+                        if (groupedRuns[candidateIndex])
+                        {
+                            continue;
+                        }
+
+                        MatchRun candidateRun = runs[candidateIndex];
+                        if (candidateRun.TileType == currentRun.TileType &&
+                            Intersects(currentRun, candidateRun))
+                        {
+                            groupedRuns[candidateIndex] = true;
+                            runsToVisit.Enqueue(candidateIndex);
+                        }
+                    }
+                }
+
+                List<Vector2Int> patternCells = new();
+                for (int patternRunIndex = 0; patternRunIndex < patternRuns.Count; patternRunIndex++)
+                {
+                    patternCells.AddRange(patternRuns[patternRunIndex].Cells);
+                }
+
+                patterns.Add(new MatchPattern(
+                    patternRuns[0].TileType,
+                    Classify(patternRuns),
+                    patternCells));
+            }
+
+            return patterns;
+        }
+
+        private static MatchShape Classify(IReadOnlyList<MatchRun> runs)
+        {
+            if (runs.Count == 1)
+            {
+                return MatchShape.Straight;
+            }
+
+            if (runs.Count != 2 || runs[0].Orientation == runs[1].Orientation)
+            {
+                return MatchShape.Complex;
+            }
+
+            if (!TryGetSingleIntersection(runs[0], runs[1], out Vector2Int intersection))
+            {
+                return MatchShape.Complex;
+            }
+
+            bool firstIntersectsAtEndpoint = IsEndpoint(runs[0], intersection);
+            bool secondIntersectsAtEndpoint = IsEndpoint(runs[1], intersection);
+
+            if (firstIntersectsAtEndpoint && secondIntersectsAtEndpoint)
+            {
+                return MatchShape.L;
+            }
+
+            if (firstIntersectsAtEndpoint || secondIntersectsAtEndpoint)
+            {
+                return MatchShape.T;
+            }
+
+            return MatchShape.Cross;
+        }
+
+        private static bool Intersects(MatchRun first, MatchRun second)
+        {
+            for (int firstIndex = 0; firstIndex < first.Cells.Count; firstIndex++)
+            {
+                for (int secondIndex = 0; secondIndex < second.Cells.Count; secondIndex++)
+                {
+                    if (first.Cells[firstIndex] == second.Cells[secondIndex])
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryGetSingleIntersection(
+            MatchRun first,
+            MatchRun second,
+            out Vector2Int intersection)
+        {
+            intersection = default;
+            int intersectionCount = 0;
+
+            for (int firstIndex = 0; firstIndex < first.Cells.Count; firstIndex++)
+            {
+                for (int secondIndex = 0; secondIndex < second.Cells.Count; secondIndex++)
+                {
+                    if (first.Cells[firstIndex] != second.Cells[secondIndex])
+                    {
+                        continue;
+                    }
+
+                    intersection = first.Cells[firstIndex];
+                    intersectionCount++;
+                }
+            }
+
+            return intersectionCount == 1;
+        }
+
+        private static bool IsEndpoint(MatchRun run, Vector2Int cell)
+        {
+            return run.Cells[0] == cell || run.Cells[run.Cells.Count - 1] == cell;
+        }
+
+        private enum RunOrientation
+        {
+            Horizontal,
+            Vertical
+        }
+
+        private sealed class MatchRun
+        {
+            internal int TileType { get; }
+            internal RunOrientation Orientation { get; }
+            internal IReadOnlyList<Vector2Int> Cells { get; }
+
+            internal MatchRun(
+                int tileType,
+                RunOrientation orientation,
+                IReadOnlyList<Vector2Int> cells)
+            {
+                TileType = tileType;
+                Orientation = orientation;
+                Cells = cells;
+            }
         }
     }
 }
