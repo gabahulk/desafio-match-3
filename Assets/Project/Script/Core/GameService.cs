@@ -65,17 +65,32 @@ namespace Gazeus.DesafioMatch3.Core
 
             while (patterns.Count > 0)
             {
-                SpecialCreationResult creation = SpecialTileRules.CreateSpecials(
-                    board,
-                    patterns,
-                    context);
+                List<SpecialTileInfo> createdSpecialTiles = new();
+                HashSet<Vector2Int> protectedCells = new();
+                for (int patternIndex = 0; patternIndex < patterns.Count; patternIndex++)
+                {
+                    MatchPattern pattern = patterns[patternIndex];
+                    if (!pattern.CreatesSpecial)
+                    {
+                        continue;
+                    }
+
+                    SpecialCreationResult creation = SpecialCreator.Create(
+                        board,
+                        pattern,
+                        context,
+                        protectedCells);
+                    createdSpecialTiles.AddRange(creation.CreatedSpecialTiles);
+                    protectedCells.UnionWith(creation.ProtectedCells);
+                }
+
                 HashSet<Vector2Int> destructionCells = BuildMatchedCells(
                     patterns,
-                    creation.ProtectedCells);
-                destructionCells = SpecialTileRules.ExpandDestruction(
+                    protectedCells);
+                destructionCells = SpecialEffectResolver.Expand(
                     board,
                     destructionCells,
-                    creation.ProtectedCells);
+                    protectedCells);
 
                 List<Vector2Int> matchedPosition = new(destructionCells.Count);
                 for (int y = 0; y < board.Height; y++)
@@ -164,7 +179,7 @@ namespace Gazeus.DesafioMatch3.Core
                     MatchedPosition = matchedPosition,
                     MovedTiles = movedTilesList,
                     AddedTiles = addedTiles,
-                    CreatedSpecialTiles = creation.CreatedSpecialTiles
+                    CreatedSpecialTiles = createdSpecialTiles
                 };
                 boardSequences.Add(sequence);
                 context = SpecialSpawnContext.FromCascade(movedTilesList, addedTiles);

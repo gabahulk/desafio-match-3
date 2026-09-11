@@ -10,6 +10,20 @@ namespace Gazeus.DesafioMatch3.Models
         public MatchShape Shape { get; }
         public IReadOnlyList<Vector2Int> Cells { get; }
         public int Size => Cells.Count;
+        public bool CreatesSpecial
+        {
+            get
+            {
+                if (Shape == MatchShape.Straight)
+                {
+                    return Size >= 4;
+                }
+
+                return Shape == MatchShape.L ||
+                       Shape == MatchShape.T ||
+                       Shape == MatchShape.Cross;
+            }
+        }
 
         internal MatchPattern(
             int color,

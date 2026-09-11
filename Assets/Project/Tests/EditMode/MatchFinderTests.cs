@@ -27,6 +27,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(0, 0),
                 new Vector2Int(1, 0),
                 new Vector2Int(2, 0));
+            Assert.That(patterns[0].CreatesSpecial, Is.False);
         }
 
         [Test]
@@ -61,6 +62,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Assert.That(patterns, Has.Count.EqualTo(1));
             Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Straight));
             Assert.That(patterns[0].Size, Is.EqualTo(4));
+            Assert.That(patterns[0].CreatesSpecial, Is.True);
         }
 
         [Test]
@@ -75,6 +77,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Assert.That(patterns, Has.Count.EqualTo(1));
             Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Straight));
             Assert.That(patterns[0].Size, Is.EqualTo(5));
+            Assert.That(patterns[0].CreatesSpecial, Is.True);
         }
 
         [Test]
@@ -174,6 +177,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(2, 2),
                 new Vector2Int(3, 2),
                 new Vector2Int(4, 2));
+            Assert.That(patterns[0].CreatesSpecial, Is.True);
         }
 
         [Test]
@@ -189,6 +193,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             Assert.That(patterns, Has.Count.EqualTo(1));
             Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.T));
+            Assert.That(patterns[0].CreatesSpecial, Is.True);
         }
 
         [Test]
@@ -220,6 +225,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Assert.That(patterns, Has.Count.EqualTo(1));
             Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Cross));
             Assert.That(patterns[0].Size, Is.EqualTo(5));
+            Assert.That(patterns[0].CreatesSpecial, Is.True);
             Assert.That(patterns[0].Cells, Is.EquivalentTo(new[]
             {
                 new Vector2Int(1, 2),
@@ -244,6 +250,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Assert.That(patterns, Has.Count.EqualTo(1));
             Assert.That(patterns[0].Shape, Is.EqualTo(MatchShape.Complex));
             Assert.That(patterns[0].Size, Is.EqualTo(7));
+            Assert.That(patterns[0].CreatesSpecial, Is.False);
         }
 
         [Test]
