@@ -38,7 +38,7 @@ namespace Gazeus.DesafioMatch3.Controllers
         }
         #endregion
 
-        private void AnimateBoard(List<BoardSequence> boardSequences, int index, Action onComplete)
+        private void AnimateBoard(IReadOnlyList<BoardSequence> boardSequences, int index, Action onComplete)
         {
             BoardSequence boardSequence = boardSequences[index];
 
@@ -74,11 +74,10 @@ namespace Gazeus.DesafioMatch3.Controllers
                     _isAnimating = true;
                     _boardView.SwapTiles(_selectedX, _selectedY, x, y).onComplete += () =>
                     {
-                        bool isValid = _gameService.IsValidMovement(_selectedX, _selectedY, x, y);
-                        if (isValid)
+                        MoveResult result = _gameService.TrySwap(_selectedX, _selectedY, x, y);
+                        if (result.IsValid)
                         {
-                            List<BoardSequence> swapResult = _gameService.SwapTile(_selectedX, _selectedY, x, y);
-                            AnimateBoard(swapResult, 0, () => _isAnimating = false);
+                            AnimateBoard(result.BoardSequences, 0, () => _isAnimating = false);
                         }
                         else
                         {

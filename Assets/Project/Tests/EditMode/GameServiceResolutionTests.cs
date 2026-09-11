@@ -10,7 +10,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
     public sealed class GameServiceResolutionTests
     {
         [Test]
-        public void SwapTile_WhenSwapCreatesHorizontalMatch_FirstSequenceContainsMatchedCells()
+        public void TrySwap_WhenSwapCreatesHorizontalMatch_FirstSequenceContainsMatchedCells()
         {
             Board board = BoardFixture.Create(
                 "RGBY",
@@ -20,17 +20,33 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             );
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
-            List<BoardSequence> sequences = SwapDeterministically(service, 2, 3, 3, 3);
+            MoveResult result = TrySwapDeterministically(service, 2, 3, 3, 3);
 
             AssertFirstMatchedPositions(
-                sequences,
+                result.BoardSequences,
                 new Vector2Int(0, 3),
                 new Vector2Int(1, 3),
                 new Vector2Int(2, 3));
         }
 
         [Test]
-        public void SwapTile_WhenSwapCreatesVerticalMatch_FirstSequenceContainsMatchedCells()
+        public void TrySwap_WhenRefillCreatesMatch_ReturnsAdditionalBoardSequence()
+        {
+            Board board = BoardFixture.Create(
+                "RGBY",
+                "GBYR",
+                "BYRG",
+                "RRGR"
+            );
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 2, 3, 3, 3);
+
+            Assert.That(result.BoardSequences, Has.Count.EqualTo(2));
+        }
+
+        [Test]
+        public void TrySwap_WhenSwapCreatesVerticalMatch_FirstSequenceContainsMatchedCells()
         {
             Board board = BoardFixture.Create(
                 "RGBY",
@@ -40,17 +56,17 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             );
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
-            List<BoardSequence> sequences = SwapDeterministically(service, 0, 2, 0, 3);
+            MoveResult result = TrySwapDeterministically(service, 0, 2, 0, 3);
 
             AssertFirstMatchedPositions(
-                sequences,
+                result.BoardSequences,
                 new Vector2Int(0, 0),
                 new Vector2Int(0, 1),
                 new Vector2Int(0, 2));
         }
 
         [Test]
-        public void SwapTile_WhenSwapCreatesMatchFour_FirstSequenceContainsAllFourCells()
+        public void TrySwap_WhenSwapCreatesMatchFour_FirstSequenceContainsAllFourCells()
         {
             Board board = BoardFixture.Create(
                 "RGBY",
@@ -60,10 +76,10 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             );
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
-            List<BoardSequence> sequences = SwapDeterministically(service, 2, 3, 2, 2);
+            MoveResult result = TrySwapDeterministically(service, 2, 3, 2, 2);
 
             AssertFirstMatchedPositions(
-                sequences,
+                result.BoardSequences,
                 new Vector2Int(0, 3),
                 new Vector2Int(1, 3),
                 new Vector2Int(2, 3),
@@ -71,7 +87,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
-        public void SwapTile_WhenSwapCreatesMatchFive_FirstSequenceContainsAllFiveCells()
+        public void TrySwap_WhenSwapCreatesMatchFive_FirstSequenceContainsAllFiveCells()
         {
             Board board = BoardFixture.Create(
                 "RGBYR",
@@ -82,10 +98,10 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             );
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
-            List<BoardSequence> sequences = SwapDeterministically(service, 2, 4, 2, 3);
+            MoveResult result = TrySwapDeterministically(service, 2, 4, 2, 3);
 
             AssertFirstMatchedPositions(
-                sequences,
+                result.BoardSequences,
                 new Vector2Int(0, 4),
                 new Vector2Int(1, 4),
                 new Vector2Int(2, 4),
@@ -94,7 +110,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
-        public void SwapTile_WhenSwapCreatesIntersectingMatches_FirstSequenceContainsUnionWithoutDuplicates()
+        public void TrySwap_WhenSwapCreatesIntersectingMatches_FirstSequenceContainsUnionWithoutDuplicates()
         {
             Board board = BoardFixture.Create(
                 "RGBYR",
@@ -105,10 +121,10 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             );
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
-            List<BoardSequence> sequences = SwapDeterministically(service, 2, 2, 3, 2);
+            MoveResult result = TrySwapDeterministically(service, 2, 2, 3, 2);
 
             AssertFirstMatchedPositions(
-                sequences,
+                result.BoardSequences,
                 new Vector2Int(2, 1),
                 new Vector2Int(0, 2),
                 new Vector2Int(1, 2),
@@ -117,7 +133,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
-        public void SwapTile_OnWideRectangularBoard_ResolvesHorizontalMatch()
+        public void TrySwap_OnWideRectangularBoard_ResolvesHorizontalMatch()
         {
             Board board = BoardFixture.Create(
                 "RGBYG",
@@ -126,16 +142,16 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             );
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
-            List<BoardSequence> sequences = SwapDeterministically(service, 4, 1, 4, 2);
+            MoveResult result = TrySwapDeterministically(service, 4, 1, 4, 2);
 
             AssertFirstMatchedPositions(
-                sequences,
+                result.BoardSequences,
                 new Vector2Int(2, 2),
                 new Vector2Int(3, 2),
                 new Vector2Int(4, 2));
         }
 
-        private static List<BoardSequence> SwapDeterministically(
+        private static MoveResult TrySwapDeterministically(
             GameService service,
             int fromX,
             int fromY,
@@ -146,7 +162,9 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             try
             {
                 Random.InitState(48271);
-                return service.SwapTile(fromX, fromY, toX, toY);
+                MoveResult result = service.TrySwap(fromX, fromY, toX, toY);
+                Assert.That(result.IsValid, Is.True);
+                return result;
             }
             finally
             {
@@ -155,7 +173,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         private static void AssertFirstMatchedPositions(
-            List<BoardSequence> sequences,
+            IReadOnlyList<BoardSequence> sequences,
             params Vector2Int[] expectedPositions)
         {
             Assert.That(sequences, Is.Not.Empty);
