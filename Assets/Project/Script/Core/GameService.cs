@@ -9,26 +9,26 @@ namespace Gazeus.DesafioMatch3.Core
     public class GameService
     {
         private Board _board;
-        private List<int> _tilesTypes;
+        private List<int> _colors;
         private int _tileCount;
 
         public GameService()
         {
         }
 
-        public GameService(Board board, IReadOnlyList<int> tileTypes)
+        public GameService(Board board, IReadOnlyList<int> colors)
         {
             _board = board ?? throw new ArgumentNullException(nameof(board));
-            _tilesTypes = tileTypes != null
-                ? new List<int>(tileTypes)
-                : throw new ArgumentNullException(nameof(tileTypes));
+            _colors = colors != null
+                ? new List<int>(colors)
+                : throw new ArgumentNullException(nameof(colors));
             _tileCount = GetNextTileId(board);
         }
 
         public Board StartGame(int boardWidth, int boardHeight)
         {
-            _tilesTypes = new List<int> { 0, 1, 2, 3 };
-            _board = BoardGenerator.Create(boardWidth, boardHeight, _tilesTypes);
+            _colors = new List<int> { 0, 1, 2, 3 };
+            _board = BoardGenerator.Create(boardWidth, boardHeight, _colors);
             _tileCount = boardWidth * boardHeight;
 
             return _board;
@@ -78,7 +78,12 @@ namespace Gazeus.DesafioMatch3.Core
                         if (matchedCells.Contains(position))
                         {
                             matchedPosition.Add(position);
-                            board[x, y] = new Tile { Id = -1, Type = -1 };
+                            board[x, y] = new Tile
+                            {
+                                Id = -1,
+                                Color = -1,
+                                Special = SpecialType.None
+                            };
                         }
                     }
                 }
@@ -96,7 +101,7 @@ namespace Gazeus.DesafioMatch3.Core
                         {
                             Tile movedTile = board[x, j - 1];
                             board[x, j] = movedTile;
-                            if (movedTile.Type > -1)
+                            if (!movedTile.IsEmpty)
                             {
                                 if (movedTiles.ContainsKey(movedTile.Id))
                                 {
@@ -118,7 +123,8 @@ namespace Gazeus.DesafioMatch3.Core
                         board[x, 0] = new Tile
                         {
                             Id = -1,
-                            Type = -1
+                            Color = -1,
+                            Special = SpecialType.None
                         };
                     }
                 }
@@ -129,16 +135,17 @@ namespace Gazeus.DesafioMatch3.Core
                 {
                     for (int x = board.Width - 1; x > -1; x--)
                     {
-                        if (board[x, y].Type == -1)
+                        if (board[x, y].IsEmpty)
                         {
-                            int tileType = Random.Range(0, _tilesTypes.Count);
+                            int colorIndex = Random.Range(0, _colors.Count);
                             Tile tile = board[x, y];
                             tile.Id = _tileCount++;
-                            tile.Type = _tilesTypes[tileType];
+                            tile.Color = _colors[colorIndex];
+                            tile.Special = SpecialType.None;
                             addedTiles.Add(new AddedTileInfo
                             {
                                 Position = new Vector2Int(x, y),
-                                Type = tile.Type
+                                Color = tile.Color
                             });
                         }
                     }

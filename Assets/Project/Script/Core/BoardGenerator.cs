@@ -9,7 +9,7 @@ namespace Gazeus.DesafioMatch3.Core
         internal static Board Create(
             int width,
             int height,
-            IReadOnlyList<int> tileTypes)
+            IReadOnlyList<int> colors)
         {
             Board board = new(width, height);
 
@@ -18,26 +18,27 @@ namespace Gazeus.DesafioMatch3.Core
             {
                 for (int x = 0; x < width; x++)
                 {
-                    List<int> noMatchTypes = new(tileTypes.Count);
-                    for (int i = 0; i < tileTypes.Count; i++)
+                    List<int> availableColors = new(colors.Count);
+                    for (int i = 0; i < colors.Count; i++)
                     {
-                        noMatchTypes.Add(tileTypes[i]);
+                        availableColors.Add(colors[i]);
                     }
 
                     if (x > 1 &&
-                        board[x - 1, y].Type == board[x - 2, y].Type)
+                        board[x - 1, y].Color == board[x - 2, y].Color)
                     {
-                        noMatchTypes.Remove(board[x - 1, y].Type);
+                        availableColors.Remove(board[x - 1, y].Color);
                     }
 
                     if (y > 1 &&
-                        board[x, y - 1].Type == board[x, y - 2].Type)
+                        board[x, y - 1].Color == board[x, y - 2].Color)
                     {
-                        noMatchTypes.Remove(board[x, y - 1].Type);
+                        availableColors.Remove(board[x, y - 1].Color);
                     }
 
                     board[x, y].Id = tileId++;
-                    board[x, y].Type = noMatchTypes[Random.Range(0, noMatchTypes.Count)];
+                    board[x, y].Color = availableColors[Random.Range(0, availableColors.Count)];
+                    board[x, y].Special = SpecialType.None;
                 }
             }
 

@@ -35,7 +35,12 @@ namespace Gazeus.DesafioMatch3.Models
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    _tiles[x, y] = new Tile { Id = -1, Type = -1 };
+                    _tiles[x, y] = new Tile
+                    {
+                        Id = -1,
+                        Color = -1,
+                        Special = SpecialType.None
+                    };
                 }
             }
         }
@@ -48,7 +53,12 @@ namespace Gazeus.DesafioMatch3.Models
                 for (int x = 0; x < Width; x++)
                 {
                     Tile tile = _tiles[x, y];
-                    clone[x, y] = new Tile { Id = tile.Id, Type = tile.Type };
+                    clone[x, y] = new Tile
+                    {
+                        Id = tile.Id,
+                        Color = tile.Color,
+                        Special = tile.Special
+                    };
                 }
             }
 

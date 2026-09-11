@@ -39,10 +39,10 @@ namespace Gazeus.DesafioMatch3.Views
 
                     _tileSpots[y][x] = tileSpot;
 
-                    int tileTypeIndex = board[x, y].Type;
-                    if (tileTypeIndex > -1)
+                    int colorIndex = board[x, y].Color;
+                    if (!board[x, y].IsEmpty)
                     {
-                        GameObject tilePrefab = _tilePrefabRepository.TileTypePrefabList[tileTypeIndex];
+                        GameObject tilePrefab = _tilePrefabRepository.ColorPrefabList[colorIndex];
                         GameObject tile = Instantiate(tilePrefab);
                         tileSpot.SetTile(tile);
 
@@ -62,7 +62,7 @@ namespace Gazeus.DesafioMatch3.Views
 
                 TileSpotView tileSpot = _tileSpots[position.y][position.x];
 
-                GameObject tilePrefab = _tilePrefabRepository.TileTypePrefabList[addedTileInfo.Type];
+                GameObject tilePrefab = _tilePrefabRepository.ColorPrefabList[addedTileInfo.Color];
                 GameObject tile = Instantiate(tilePrefab);
                 tileSpot.SetTile(tile);
 

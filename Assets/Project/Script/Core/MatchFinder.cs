@@ -21,11 +21,19 @@ namespace Gazeus.DesafioMatch3.Core
                 int x = 0;
                 while (x < board.Width)
                 {
+                    if (board[x, y].IsEmpty)
+                    {
+                        x++;
+                        continue;
+                    }
+
                     int runStart = x;
-                    int tileType = board[x, y].Type;
+                    int color = board[x, y].Color;
 
                     x++;
-                    while (x < board.Width && board[x, y].Type == tileType)
+                    while (x < board.Width &&
+                           !board[x, y].IsEmpty &&
+                           board[x, y].Color == color)
                     {
                         x++;
                     }
@@ -39,7 +47,7 @@ namespace Gazeus.DesafioMatch3.Core
                             cells.Add(new Vector2Int(runX, y));
                         }
 
-                        runs.Add(new MatchRun(tileType, RunOrientation.Horizontal, cells));
+                        runs.Add(new MatchRun(color, RunOrientation.Horizontal, cells));
                     }
                 }
             }
@@ -49,11 +57,19 @@ namespace Gazeus.DesafioMatch3.Core
                 int y = 0;
                 while (y < board.Height)
                 {
+                    if (board[x, y].IsEmpty)
+                    {
+                        y++;
+                        continue;
+                    }
+
                     int runStart = y;
-                    int tileType = board[x, y].Type;
+                    int color = board[x, y].Color;
 
                     y++;
-                    while (y < board.Height && board[x, y].Type == tileType)
+                    while (y < board.Height &&
+                           !board[x, y].IsEmpty &&
+                           board[x, y].Color == color)
                     {
                         y++;
                     }
@@ -67,7 +83,7 @@ namespace Gazeus.DesafioMatch3.Core
                             cells.Add(new Vector2Int(x, runY));
                         }
 
-                        runs.Add(new MatchRun(tileType, RunOrientation.Vertical, cells));
+                        runs.Add(new MatchRun(color, RunOrientation.Vertical, cells));
                     }
                 }
             }
@@ -106,7 +122,7 @@ namespace Gazeus.DesafioMatch3.Core
                         }
 
                         MatchRun candidateRun = runs[candidateIndex];
-                        if (candidateRun.TileType == currentRun.TileType &&
+                        if (candidateRun.Color == currentRun.Color &&
                             Intersects(currentRun, candidateRun))
                         {
                             groupedRuns[candidateIndex] = true;
@@ -122,7 +138,7 @@ namespace Gazeus.DesafioMatch3.Core
                 }
 
                 patterns.Add(new MatchPattern(
-                    patternRuns[0].TileType,
+                    patternRuns[0].Color,
                     Classify(patternRuns),
                     patternCells));
             }
@@ -217,16 +233,16 @@ namespace Gazeus.DesafioMatch3.Core
 
         private sealed class MatchRun
         {
-            internal int TileType { get; }
+            internal int Color { get; }
             internal RunOrientation Orientation { get; }
             internal IReadOnlyList<Vector2Int> Cells { get; }
 
             internal MatchRun(
-                int tileType,
+                int color,
                 RunOrientation orientation,
                 IReadOnlyList<Vector2Int> cells)
             {
-                TileType = tileType;
+                Color = color;
                 Orientation = orientation;
                 Cells = cells;
             }

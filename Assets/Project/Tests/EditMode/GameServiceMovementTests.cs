@@ -92,7 +92,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 for (int x = 0; x < actual.Width; x++)
                 {
                     Assert.That(actual[x, y].Id, Is.EqualTo(expected[x, y].Id));
-                    Assert.That(actual[x, y].Type, Is.EqualTo(expected[x, y].Type));
+                    Assert.That(actual[x, y].Color, Is.EqualTo(expected[x, y].Color));
+                    Assert.That(actual[x, y].Special, Is.EqualTo(expected[x, y].Special));
                 }
             }
         }

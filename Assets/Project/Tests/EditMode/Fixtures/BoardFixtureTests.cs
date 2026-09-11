@@ -16,7 +16,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
                 "YRBG"
             );
 
-            int[] expectedTypes =
+            int[] expectedColors =
             {
                 0, 1, 2, 3,
                 1, 2, 3, 0,
@@ -31,7 +31,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
                 for (int x = 0; x < board.Width; x++)
                 {
                     int expectedId = y * board.Width + x;
-                    Assert.That(board[x, y].Type, Is.EqualTo(expectedTypes[expectedId]));
+                    Assert.That(board[x, y].Color, Is.EqualTo(expectedColors[expectedId]));
+                    Assert.That(board[x, y].Special, Is.EqualTo(SpecialType.None));
                     Assert.That(board[x, y].Id, Is.EqualTo(expectedId));
                 }
             }

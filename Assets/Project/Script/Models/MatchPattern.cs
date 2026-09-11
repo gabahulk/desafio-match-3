@@ -6,13 +6,13 @@ namespace Gazeus.DesafioMatch3.Models
 {
     public sealed class MatchPattern
     {
-        public int TileType { get; }
+        public int Color { get; }
         public MatchShape Shape { get; }
         public IReadOnlyList<Vector2Int> Cells { get; }
         public int Size => Cells.Count;
 
         internal MatchPattern(
-            int tileType,
+            int color,
             MatchShape shape,
             IReadOnlyList<Vector2Int> cells)
         {
@@ -21,7 +21,7 @@ namespace Gazeus.DesafioMatch3.Models
                 throw new ArgumentNullException(nameof(cells));
             }
 
-            TileType = tileType;
+            Color = color;
             Shape = shape;
 
             HashSet<Vector2Int> uniqueCells = new();

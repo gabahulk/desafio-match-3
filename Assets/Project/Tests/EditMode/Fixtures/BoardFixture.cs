@@ -23,7 +23,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
             }
 
             int width = rows[0].Length;
-            int[][] tileTypes = new int[rows.Length][];
+            int[][] colors = new int[rows.Length][];
             for (int y = 0; y < rows.Length; y++)
             {
                 if (rows[y] == null || rows[y].Length != width)
@@ -33,10 +33,10 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
                         nameof(rows));
                 }
 
-                tileTypes[y] = new int[width];
+                colors[y] = new int[width];
                 for (int x = 0; x < width; x++)
                 {
-                    tileTypes[y][x] = GetTileType(rows[y][x], x, y);
+                    colors[y][x] = GetColor(rows[y][x], x, y);
                 }
             }
 
@@ -47,14 +47,15 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
                 for (int x = 0; x < board.Width; x++)
                 {
                     board[x, y].Id = tileId++;
-                    board[x, y].Type = tileTypes[y][x];
+                    board[x, y].Color = colors[y][x];
+                    board[x, y].Special = SpecialType.None;
                 }
             }
 
             return board;
         }
 
-        private static int GetTileType(char symbol, int x, int y)
+        private static int GetColor(char symbol, int x, int y)
         {
             switch (symbol)
             {

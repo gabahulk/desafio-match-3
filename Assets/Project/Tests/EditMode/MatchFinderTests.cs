@@ -110,7 +110,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
-        public void FindMatches_WithIndependentRunsOfSameType_ReturnsSeparatePatterns()
+        public void FindMatches_WithIndependentRunsOfSameColor_ReturnsSeparatePatterns()
         {
             IReadOnlyList<MatchPattern> patterns = FindPatterns(
                 "RRRGB",
@@ -119,8 +119,39 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             );
 
             Assert.That(patterns, Has.Count.EqualTo(2));
-            Assert.That(patterns.All(pattern => pattern.TileType == 0), Is.True);
+            Assert.That(patterns.All(pattern => pattern.Color == 0), Is.True);
             Assert.That(patterns.All(pattern => pattern.Shape == MatchShape.Straight), Is.True);
+        }
+
+        [Test]
+        public void FindMatches_WithColoredSpecialInRun_MatchesByColor()
+        {
+            Board board = BoardFixture.Create(
+                "RRR",
+                "GBY"
+            );
+            board[1, 0].Special = SpecialType.HorizontalStriped;
+
+            IReadOnlyList<MatchPattern> patterns = MatchFinder.FindMatches(board);
+
+            Assert.That(patterns, Has.Count.EqualTo(1));
+            AssertPattern(
+                patterns[0],
+                0,
+                MatchShape.Straight,
+                new Vector2Int(0, 0),
+                new Vector2Int(1, 0),
+                new Vector2Int(2, 0));
+        }
+
+        [Test]
+        public void FindMatches_WithEmptyCells_DoesNotMatchEmptyColor()
+        {
+            Board board = new(3, 1);
+
+            IReadOnlyList<MatchPattern> patterns = MatchFinder.FindMatches(board);
+
+            Assert.That(patterns, Is.Empty);
         }
 
         [Test]
@@ -235,11 +266,11 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
         private static void AssertPattern(
             MatchPattern pattern,
-            int expectedTileType,
+            int expectedColor,
             MatchShape expectedShape,
             params Vector2Int[] expectedCells)
         {
-            Assert.That(pattern.TileType, Is.EqualTo(expectedTileType));
+            Assert.That(pattern.Color, Is.EqualTo(expectedColor));
             Assert.That(pattern.Shape, Is.EqualTo(expectedShape));
             Assert.That(pattern.Size, Is.EqualTo(expectedCells.Length));
             Assert.That(pattern.Cells, Is.EquivalentTo(expectedCells));

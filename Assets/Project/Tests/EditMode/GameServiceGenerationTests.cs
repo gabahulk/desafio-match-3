@@ -37,6 +37,23 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
+        public void StartGame_CreatesOnlyNormalTiles()
+        {
+            var service = new GameService();
+
+            Board board = service.StartGame(4, 3);
+
+            for (int y = 0; y < board.Height; y++)
+            {
+                for (int x = 0; x < board.Width; x++)
+                {
+                    Assert.That(board[x, y].Special, Is.EqualTo(SpecialType.None));
+                    Assert.That(board[x, y].IsEmpty, Is.False);
+                }
+            }
+        }
+
+        [Test]
         public void StartGame_Repeatedly_DoesNotCreateImmediateMatches()
         {
             Random.State originalRandomState = Random.state;
@@ -67,8 +84,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                     if (x >= 2)
                     {
                         bool hasHorizontalMatch =
-                            board[x, y].Type == board[x - 1, y].Type &&
-                            board[x - 1, y].Type == board[x - 2, y].Type;
+                            board[x, y].Color == board[x - 1, y].Color &&
+                            board[x - 1, y].Color == board[x - 2, y].Color;
 
                         Assert.That(
                             hasHorizontalMatch,
@@ -79,8 +96,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                     if (y >= 2)
                     {
                         bool hasVerticalMatch =
-                            board[x, y].Type == board[x, y - 1].Type &&
-                            board[x, y - 1].Type == board[x, y - 2].Type;
+                            board[x, y].Color == board[x, y - 1].Color &&
+                            board[x, y - 1].Color == board[x, y - 2].Color;
 
                         Assert.That(
                             hasVerticalMatch,
