@@ -45,6 +45,7 @@ namespace Gazeus.DesafioMatch3.Views
                         GameObject tilePrefab = _tilePrefabRepository.ColorPrefabList[colorIndex];
                         GameObject tile = Instantiate(tilePrefab);
                         tileSpot.SetTile(tile);
+                        ApplySpecialVisual(tile, board[x, y].Special);
 
                         _tiles[y][x] = tile;
                     }
@@ -73,6 +74,16 @@ namespace Gazeus.DesafioMatch3.Views
             }
 
             return sequence;
+        }
+
+        public void ApplyCreatedSpecials(List<SpecialTileInfo> createdSpecialTiles)
+        {
+            for (int index = 0; index < createdSpecialTiles.Count; index++)
+            {
+                SpecialTileInfo specialTile = createdSpecialTiles[index];
+                GameObject tile = _tiles[specialTile.Position.y][specialTile.Position.x];
+                ApplySpecialVisual(tile, specialTile.Special);
+            }
         }
 
         public Tween DestroyTiles(List<Vector2Int> matchedPosition)
@@ -126,6 +137,44 @@ namespace Gazeus.DesafioMatch3.Views
             (_tiles[toY][toX], _tiles[fromY][fromX]) = (_tiles[fromY][fromX], _tiles[toY][toX]);
 
             return sequence;
+        }
+
+        private static void ApplySpecialVisual(GameObject tile, SpecialType special)
+        {
+            if (tile == null ||
+                (special != SpecialType.HorizontalStriped &&
+                 special != SpecialType.VerticalStriped))
+            {
+                return;
+            }
+
+            string overlayName = $"{special} Overlay";
+            if (tile.transform.Find(overlayName) != null)
+            {
+                return;
+            }
+
+            GameObject overlay = new(overlayName, typeof(RectTransform), typeof(Image));
+            RectTransform rectTransform = (RectTransform)overlay.transform;
+            rectTransform.SetParent(tile.transform, false);
+
+            if (special == SpecialType.HorizontalStriped)
+            {
+                rectTransform.anchorMin = new Vector2(0.1f, 0.42f);
+                rectTransform.anchorMax = new Vector2(0.9f, 0.58f);
+            }
+            else
+            {
+                rectTransform.anchorMin = new Vector2(0.42f, 0.1f);
+                rectTransform.anchorMax = new Vector2(0.58f, 0.9f);
+            }
+
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
+
+            Image stripe = overlay.GetComponent<Image>();
+            stripe.color = new Color(1.0f, 1.0f, 1.0f, 0.85f);
+            stripe.raycastTarget = false;
         }
 
         #region Events

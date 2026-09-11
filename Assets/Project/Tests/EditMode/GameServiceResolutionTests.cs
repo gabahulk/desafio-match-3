@@ -82,8 +82,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 result.BoardSequences,
                 new Vector2Int(0, 3),
                 new Vector2Int(1, 3),
-                new Vector2Int(2, 3),
                 new Vector2Int(3, 3));
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles, Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -107,6 +107,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(2, 4),
                 new Vector2Int(3, 4),
                 new Vector2Int(4, 4));
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles, Is.Empty);
         }
 
         [Test]
