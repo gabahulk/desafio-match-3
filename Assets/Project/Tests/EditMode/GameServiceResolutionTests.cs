@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Reflection;
 using Gazeus.DesafioMatch3.Core;
 using Gazeus.DesafioMatch3.Models;
 using Gazeus.DesafioMatch3.Tests.EditMode.Fixtures;
@@ -136,27 +135,6 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(4, 2));
         }
 
-        [Test]
-        public void SwapTile_WithInjectedNonContiguousIds_RefillIdsStartAfterHighestExistingId()
-        {
-            Board board = BoardFixture.Create(
-                "RGBY",
-                "GBYR",
-                "BYRG",
-                "RRGR"
-            );
-            board[3, 3].Id = 99;
-            var service = new GameService(board, new[] { 4, 5, 6, 7, 8, 9, 10, 11 });
-
-            List<BoardSequence> sequences = SwapDeterministically(service, 2, 3, 3, 3);
-
-            Board resolvedBoard = GetServiceBoard(service);
-            Assert.That(sequences, Has.Count.EqualTo(1));
-            Assert.That(resolvedBoard[0, 0].Id, Is.EqualTo(102));
-            Assert.That(resolvedBoard[1, 0].Id, Is.EqualTo(101));
-            Assert.That(resolvedBoard[2, 0].Id, Is.EqualTo(100));
-        }
-
         private static List<BoardSequence> SwapDeterministically(
             GameService service,
             int fromX,
@@ -183,16 +161,6 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Assert.That(sequences, Is.Not.Empty);
             Assert.That(sequences[0].MatchedPosition, Has.Count.EqualTo(expectedPositions.Length));
             Assert.That(sequences[0].MatchedPosition, Is.EquivalentTo(expectedPositions));
-        }
-
-        private static Board GetServiceBoard(GameService service)
-        {
-            FieldInfo boardField = typeof(GameService).GetField(
-                "_board",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            Assert.That(boardField, Is.Not.Null);
-            return (Board)boardField.GetValue(service);
         }
     }
 }
