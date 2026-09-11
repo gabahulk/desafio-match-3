@@ -60,13 +60,13 @@ namespace Gazeus.DesafioMatch3.Core
             while (matches.Count > 0)
             {
                 //Cleaning the matched tiles
+                IReadOnlyList<MatchGroup> matchGroups = MatchGrouper.Group(matches);
                 HashSet<Vector2Int> matchedCells = new();
-                for (int matchIndex = 0; matchIndex < matches.Count; matchIndex++)
+                for (int groupIndex = 0; groupIndex < matchGroups.Count; groupIndex++)
                 {
-                    IReadOnlyList<Vector2Int> cells = matches[matchIndex].Cells;
-                    for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+                    foreach (Vector2Int cell in matchGroups[groupIndex].Cells)
                     {
-                        matchedCells.Add(cells[cellIndex]);
+                        matchedCells.Add(cell);
                     }
                 }
 
