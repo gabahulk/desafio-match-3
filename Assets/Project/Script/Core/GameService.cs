@@ -41,33 +41,44 @@ namespace Gazeus.DesafioMatch3.Core
             (candidateBoard[toX, toY], candidateBoard[fromX, fromY]) =
                 (candidateBoard[fromX, fromY], candidateBoard[toX, toY]);
 
-            List<List<bool>> matchedTiles = MatchFinder.FindMatches(candidateBoard);
-            if (!MatchFinder.HasMatch(matchedTiles))
+            IReadOnlyList<Match> matches = MatchFinder.FindMatches(candidateBoard);
+            if (matches.Count == 0)
             {
                 return new MoveResult(false, Array.Empty<BoardSequence>());
             }
 
-            List<BoardSequence> boardSequences = Resolve(candidateBoard, matchedTiles);
+            List<BoardSequence> boardSequences = Resolve(candidateBoard, matches);
             _board = candidateBoard;
 
             return new MoveResult(true, boardSequences);
         }
 
-        private List<BoardSequence> Resolve(Board board, List<List<bool>> matchedTiles)
+        private List<BoardSequence> Resolve(Board board, IReadOnlyList<Match> matches)
         {
             List<BoardSequence> boardSequences = new();
 
-            while (MatchFinder.HasMatch(matchedTiles))
+            while (matches.Count > 0)
             {
                 //Cleaning the matched tiles
-                List<Vector2Int> matchedPosition = new();
+                HashSet<Vector2Int> matchedCells = new();
+                for (int matchIndex = 0; matchIndex < matches.Count; matchIndex++)
+                {
+                    IReadOnlyList<Vector2Int> cells = matches[matchIndex].Cells;
+                    for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+                    {
+                        matchedCells.Add(cells[cellIndex]);
+                    }
+                }
+
+                List<Vector2Int> matchedPosition = new(matchedCells.Count);
                 for (int y = 0; y < board.Height; y++)
                 {
                     for (int x = 0; x < board.Width; x++)
                     {
-                        if (matchedTiles[y][x])
+                        Vector2Int position = new(x, y);
+                        if (matchedCells.Contains(position))
                         {
-                            matchedPosition.Add(new Vector2Int(x, y));
+                            matchedPosition.Add(position);
                             board[x, y] = new Tile { Id = -1, Type = -1 };
                         }
                     }
@@ -141,7 +152,7 @@ namespace Gazeus.DesafioMatch3.Core
                     AddedTiles = addedTiles
                 };
                 boardSequences.Add(sequence);
-                matchedTiles = MatchFinder.FindMatches(board);
+                matches = MatchFinder.FindMatches(board);
             }
 
             return boardSequences;

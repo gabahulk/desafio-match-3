@@ -1,63 +1,72 @@
 using System.Collections.Generic;
 using Gazeus.DesafioMatch3.Models;
+using UnityEngine;
 
 namespace Gazeus.DesafioMatch3.Core
 {
-    internal static class MatchFinder
+    public static class MatchFinder
     {
-        internal static List<List<bool>> FindMatches(Board board)
+        public static IReadOnlyList<Match> FindMatches(Board board)
         {
-            List<List<bool>> matchedTiles = new();
-            for (int y = 0; y < board.Height; y++)
-            {
-                matchedTiles.Add(new List<bool>(board.Width));
-                for (int x = 0; x < board.Width; x++)
-                {
-                    matchedTiles[y].Add(false);
-                }
-            }
+            List<Match> matches = new();
 
             for (int y = 0; y < board.Height; y++)
             {
-                for (int x = 0; x < board.Width; x++)
+                int x = 0;
+                while (x < board.Width)
                 {
-                    if (x > 1 &&
-                        board[x, y].Type == board[x - 1, y].Type &&
-                        board[x - 1, y].Type == board[x - 2, y].Type)
+                    int runStart = x;
+                    int tileType = board[x, y].Type;
+
+                    x++;
+                    while (x < board.Width && board[x, y].Type == tileType)
                     {
-                        matchedTiles[y][x] = true;
-                        matchedTiles[y][x - 1] = true;
-                        matchedTiles[y][x - 2] = true;
+                        x++;
                     }
 
-                    if (y > 1 &&
-                        board[x, y].Type == board[x, y - 1].Type &&
-                        board[x, y - 1].Type == board[x, y - 2].Type)
+                    int runLength = x - runStart;
+                    if (runLength >= 3)
                     {
-                        matchedTiles[y][x] = true;
-                        matchedTiles[y - 1][x] = true;
-                        matchedTiles[y - 2][x] = true;
+                        List<Vector2Int> cells = new(runLength);
+                        for (int runX = runStart; runX < x; runX++)
+                        {
+                            cells.Add(new Vector2Int(runX, y));
+                        }
+
+                        matches.Add(new Match(tileType, MatchOrientation.Horizontal, cells));
                     }
                 }
             }
 
-            return matchedTiles;
-        }
-
-        internal static bool HasMatch(List<List<bool>> matchedTiles)
-        {
-            for (int y = 0; y < matchedTiles.Count; y++)
+            for (int x = 0; x < board.Width; x++)
             {
-                for (int x = 0; x < matchedTiles[y].Count; x++)
+                int y = 0;
+                while (y < board.Height)
                 {
-                    if (matchedTiles[y][x])
+                    int runStart = y;
+                    int tileType = board[x, y].Type;
+
+                    y++;
+                    while (y < board.Height && board[x, y].Type == tileType)
                     {
-                        return true;
+                        y++;
+                    }
+
+                    int runLength = y - runStart;
+                    if (runLength >= 3)
+                    {
+                        List<Vector2Int> cells = new(runLength);
+                        for (int runY = runStart; runY < y; runY++)
+                        {
+                            cells.Add(new Vector2Int(x, runY));
+                        }
+
+                        matches.Add(new Match(tileType, MatchOrientation.Vertical, cells));
                     }
                 }
             }
 
-            return false;
+            return matches;
         }
     }
 }
