@@ -33,7 +33,7 @@ namespace Gazeus.DesafioMatch3.Controllers
 
         private void Start()
         {
-            List<List<Tile>> board = _gameService.StartGame(_boardWidth, _boardHeight);
+            Board board = _gameService.StartGame(_boardWidth, _boardHeight);
             _boardView.CreateBoard(board);
         }
         #endregion

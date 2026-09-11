@@ -1,6 +1,5 @@
 using System;
-using System.Linq;
-using Gazeus.DesafioMatch3.Core;
+using Gazeus.DesafioMatch3.Models;
 using NUnit.Framework;
 
 namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
@@ -8,14 +7,9 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
     public sealed class BoardFixtureTests
     {
         [Test]
-        public void Apply_MapsSymbolsAndPreservesTileIds()
+        public void Create_MapsSymbolsAndAssignsSequentialTileIds()
         {
-            var service = new GameService();
-            var board = service.StartGame(4, 4);
-            int[] originalIds = board.SelectMany(row => row).Select(tile => tile.Id).ToArray();
-
-            BoardFixture.Apply(
-                board,
+            Board board = BoardFixture.Create(
                 "RGBY",
                 "GBYR",
                 "BYRG",
@@ -30,36 +24,29 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
                 3, 0, 2, 1
             };
 
-            Assert.That(
-                board.SelectMany(row => row).Select(tile => tile.Type),
-                Is.EqualTo(expectedTypes));
-            Assert.That(
-                board.SelectMany(row => row).Select(tile => tile.Id),
-                Is.EqualTo(originalIds));
+            Assert.That(board.Width, Is.EqualTo(4));
+            Assert.That(board.Height, Is.EqualTo(4));
+            for (int y = 0; y < board.Height; y++)
+            {
+                for (int x = 0; x < board.Width; x++)
+                {
+                    int expectedId = y * board.Width + x;
+                    Assert.That(board[x, y].Type, Is.EqualTo(expectedTypes[expectedId]));
+                    Assert.That(board[x, y].Id, Is.EqualTo(expectedId));
+                }
+            }
         }
 
         [Test]
-        public void Apply_WhenRowCountDoesNotMatchBoardHeight_Throws()
+        public void Create_WhenNoRowsAreProvided_Throws()
         {
-            var service = new GameService();
-            var board = service.StartGame(4, 4);
-
-            Assert.Throws<ArgumentException>(() => BoardFixture.Apply(
-                board,
-                "RGBY",
-                "GBYR",
-                "BYRG"
-            ));
+            Assert.Throws<ArgumentException>(() => BoardFixture.Create());
         }
 
         [Test]
-        public void Apply_WhenRowWidthDoesNotMatchBoardWidth_Throws()
+        public void Create_WhenRowsHaveDifferentWidths_Throws()
         {
-            var service = new GameService();
-            var board = service.StartGame(4, 4);
-
-            Assert.Throws<ArgumentException>(() => BoardFixture.Apply(
-                board,
+            Assert.Throws<ArgumentException>(() => BoardFixture.Create(
                 "RGBY",
                 "GBY",
                 "BYRG",
@@ -68,13 +55,9 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
         }
 
         [Test]
-        public void Apply_WhenSymbolIsUnsupported_Throws()
+        public void Create_WhenSymbolIsUnsupported_Throws()
         {
-            var service = new GameService();
-            var board = service.StartGame(4, 4);
-
-            Assert.Throws<ArgumentException>(() => BoardFixture.Apply(
-                board,
+            Assert.Throws<ArgumentException>(() => BoardFixture.Create(
                 "RGBY",
                 "GBYR",
                 "BYXG",

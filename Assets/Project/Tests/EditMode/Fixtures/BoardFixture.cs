@@ -1,54 +1,57 @@
 using System;
-using System.Collections.Generic;
 using Gazeus.DesafioMatch3.Models;
 
 namespace Gazeus.DesafioMatch3.Tests.EditMode.Fixtures
 {
     internal static class BoardFixture
     {
-        public static void Apply(List<List<Tile>> board, params string[] rows)
+        public static Board Create(params string[] rows)
         {
-            if (board == null)
-            {
-                throw new ArgumentNullException(nameof(board));
-            }
-
             if (rows == null)
             {
                 throw new ArgumentNullException(nameof(rows));
             }
 
-            if (rows.Length != board.Count)
+            if (rows.Length == 0)
             {
-                throw new ArgumentException(
-                    $"Expected {board.Count} rows, but received {rows.Length}.",
-                    nameof(rows));
+                throw new ArgumentException("At least one row is required.", nameof(rows));
             }
 
+            if (rows[0] == null)
+            {
+                throw new ArgumentException("Row 0 cannot be null.", nameof(rows));
+            }
+
+            int width = rows[0].Length;
             int[][] tileTypes = new int[rows.Length][];
             for (int y = 0; y < rows.Length; y++)
             {
-                if (rows[y] == null || rows[y].Length != board[y].Count)
+                if (rows[y] == null || rows[y].Length != width)
                 {
                     throw new ArgumentException(
-                        $"Row {y} must contain exactly {board[y].Count} symbols.",
+                        $"Row {y} must contain exactly {width} symbols.",
                         nameof(rows));
                 }
 
-                tileTypes[y] = new int[rows[y].Length];
-                for (int x = 0; x < rows[y].Length; x++)
+                tileTypes[y] = new int[width];
+                for (int x = 0; x < width; x++)
                 {
                     tileTypes[y][x] = GetTileType(rows[y][x], x, y);
                 }
             }
 
-            for (int y = 0; y < tileTypes.Length; y++)
+            Board board = new(width, rows.Length);
+            int tileId = 0;
+            for (int y = 0; y < board.Height; y++)
             {
-                for (int x = 0; x < tileTypes[y].Length; x++)
+                for (int x = 0; x < board.Width; x++)
                 {
-                    board[y][x].Type = tileTypes[y][x];
+                    board[x, y].Id = tileId++;
+                    board[x, y].Type = tileTypes[y][x];
                 }
             }
+
+            return board;
         }
 
         private static int GetTileType(char symbol, int x, int y)

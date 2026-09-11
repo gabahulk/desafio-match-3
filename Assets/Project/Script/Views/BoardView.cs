@@ -19,18 +19,18 @@ namespace Gazeus.DesafioMatch3.Views
         private GameObject[][] _tiles;
         private TileSpotView[][] _tileSpots;
 
-        public void CreateBoard(List<List<Tile>> board)
+        public void CreateBoard(Board board)
         {
-            _boardContainer.constraintCount = board[0].Count;
-            _tiles = new GameObject[board.Count][];
-            _tileSpots = new TileSpotView[board.Count][];
+            _boardContainer.constraintCount = board.Width;
+            _tiles = new GameObject[board.Height][];
+            _tileSpots = new TileSpotView[board.Height][];
 
-            for (int y = 0; y < board.Count; y++)
+            for (int y = 0; y < board.Height; y++)
             {
-                _tiles[y] = new GameObject[board[0].Count];
-                _tileSpots[y] = new TileSpotView[board[0].Count];
+                _tiles[y] = new GameObject[board.Width];
+                _tileSpots[y] = new TileSpotView[board.Width];
 
-                for (int x = 0; x < board[0].Count; x++)
+                for (int x = 0; x < board.Width; x++)
                 {
                     TileSpotView tileSpot = Instantiate(_tileSpotPrefab);
                     tileSpot.transform.SetParent(_boardContainer.transform, false);
@@ -39,7 +39,7 @@ namespace Gazeus.DesafioMatch3.Views
 
                     _tileSpots[y][x] = tileSpot;
 
-                    int tileTypeIndex = board[y][x].Type;
+                    int tileTypeIndex = board[x, y].Type;
                     if (tileTypeIndex > -1)
                     {
                         GameObject tilePrefab = _tilePrefabRepository.TileTypePrefabList[tileTypeIndex];

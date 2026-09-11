@@ -1,38 +1,53 @@
+using System;
 using System.Collections.Generic;
 using Gazeus.DesafioMatch3.Models;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Gazeus.DesafioMatch3.Core
 {
     public class GameService
     {
-        private List<List<Tile>> _boardTiles;
+        private Board _board;
         private List<int> _tilesTypes;
         private int _tileCount;
 
+        public GameService()
+        {
+        }
+
+        public GameService(Board board, IReadOnlyList<int> tileTypes)
+        {
+            _board = board ?? throw new ArgumentNullException(nameof(board));
+            _tilesTypes = tileTypes != null
+                ? new List<int>(tileTypes)
+                : throw new ArgumentNullException(nameof(tileTypes));
+            _tileCount = GetNextTileId(board);
+        }
+
         public bool IsValidMovement(int fromX, int fromY, int toX, int toY)
         {
-            List<List<Tile>> newBoard = CopyBoard(_boardTiles);
+            Board newBoard = _board.Clone();
 
-            (newBoard[toY][toX], newBoard[fromY][fromX]) = (newBoard[fromY][fromX], newBoard[toY][toX]);
+            (newBoard[toX, toY], newBoard[fromX, fromY]) = (newBoard[fromX, fromY], newBoard[toX, toY]);
 
             return MatchFinder.HasMatch(MatchFinder.FindMatches(newBoard));
         }
 
-        public List<List<Tile>> StartGame(int boardWidth, int boardHeight)
+        public Board StartGame(int boardWidth, int boardHeight)
         {
             _tilesTypes = new List<int> { 0, 1, 2, 3 };
-            _boardTiles = BoardGenerator.Create(boardWidth, boardHeight, _tilesTypes);
+            _board = BoardGenerator.Create(boardWidth, boardHeight, _tilesTypes);
             _tileCount = boardWidth * boardHeight;
 
-            return _boardTiles;
+            return _board;
         }
 
         public List<BoardSequence> SwapTile(int fromX, int fromY, int toX, int toY)
         {
-            List<List<Tile>> newBoard = CopyBoard(_boardTiles);
+            Board newBoard = _board.Clone();
 
-            (newBoard[toY][toX], newBoard[fromY][fromX]) = (newBoard[fromY][fromX], newBoard[toY][toX]);
+            (newBoard[toX, toY], newBoard[fromX, fromY]) = (newBoard[fromX, fromY], newBoard[toX, toY]);
 
             List<BoardSequence> boardSequences = new();
             List<List<bool>> matchedTiles = MatchFinder.FindMatches(newBoard);
@@ -41,14 +56,14 @@ namespace Gazeus.DesafioMatch3.Core
             {
                 //Cleaning the matched tiles
                 List<Vector2Int> matchedPosition = new();
-                for (int y = 0; y < newBoard.Count; y++)
+                for (int y = 0; y < newBoard.Height; y++)
                 {
-                    for (int x = 0; x < newBoard[y].Count; x++)
+                    for (int x = 0; x < newBoard.Width; x++)
                     {
                         if (matchedTiles[y][x])
                         {
                             matchedPosition.Add(new Vector2Int(x, y));
-                            newBoard[y][x] = new Tile { Id = -1, Type = -1 };
+                            newBoard[x, y] = new Tile { Id = -1, Type = -1 };
                         }
                     }
                 }
@@ -64,8 +79,8 @@ namespace Gazeus.DesafioMatch3.Core
                     {
                         for (int j = y; j > 0; j--)
                         {
-                            Tile movedTile = newBoard[j - 1][x];
-                            newBoard[j][x] = movedTile;
+                            Tile movedTile = newBoard[x, j - 1];
+                            newBoard[x, j] = movedTile;
                             if (movedTile.Type > -1)
                             {
                                 if (movedTiles.ContainsKey(movedTile.Id))
@@ -85,7 +100,7 @@ namespace Gazeus.DesafioMatch3.Core
                             }
                         }
 
-                        newBoard[0][x] = new Tile
+                        newBoard[x, 0] = new Tile
                         {
                             Id = -1,
                             Type = -1
@@ -95,14 +110,14 @@ namespace Gazeus.DesafioMatch3.Core
 
                 // Filling the board
                 List<AddedTileInfo> addedTiles = new();
-                for (int y = newBoard.Count - 1; y > -1; y--)
+                for (int y = newBoard.Height - 1; y > -1; y--)
                 {
-                    for (int x = newBoard[y].Count - 1; x > -1; x--)
+                    for (int x = newBoard.Width - 1; x > -1; x--)
                     {
-                        if (newBoard[y][x].Type == -1)
+                        if (newBoard[x, y].Type == -1)
                         {
                             int tileType = Random.Range(0, _tilesTypes.Count);
-                            Tile tile = newBoard[y][x];
+                            Tile tile = newBoard[x, y];
                             tile.Id = _tileCount++;
                             tile.Type = _tilesTypes[tileType];
                             addedTiles.Add(new AddedTileInfo
@@ -124,25 +139,27 @@ namespace Gazeus.DesafioMatch3.Core
                 matchedTiles = MatchFinder.FindMatches(newBoard);
             }
 
-            _boardTiles = newBoard;
+            _board = newBoard;
 
             return boardSequences;
         }
 
-        private static List<List<Tile>> CopyBoard(List<List<Tile>> boardToCopy)
+        private static int GetNextTileId(Board board)
         {
-            List<List<Tile>> newBoard = new(boardToCopy.Count);
-            for (int y = 0; y < boardToCopy.Count; y++)
+            int highestTileId = -1;
+            for (int y = 0; y < board.Height; y++)
             {
-                newBoard.Add(new List<Tile>(boardToCopy[y].Count));
-                for (int x = 0; x < boardToCopy[y].Count; x++)
+                for (int x = 0; x < board.Width; x++)
                 {
-                    Tile tile = boardToCopy[y][x];
-                    newBoard[y].Add(new Tile { Id = tile.Id, Type = tile.Type });
+                    int tileId = board[x, y].Id;
+                    if (tileId > highestTileId)
+                    {
+                        highestTileId = tileId;
+                    }
                 }
             }
 
-            return newBoard;
+            return highestTileId + 1;
         }
 
     }

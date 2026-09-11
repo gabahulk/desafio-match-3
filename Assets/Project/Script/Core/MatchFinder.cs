@@ -5,25 +5,25 @@ namespace Gazeus.DesafioMatch3.Core
 {
     internal static class MatchFinder
     {
-        internal static List<List<bool>> FindMatches(List<List<Tile>> board)
+        internal static List<List<bool>> FindMatches(Board board)
         {
             List<List<bool>> matchedTiles = new();
-            for (int y = 0; y < board.Count; y++)
+            for (int y = 0; y < board.Height; y++)
             {
-                matchedTiles.Add(new List<bool>(board[y].Count));
-                for (int x = 0; x < board[y].Count; x++)
+                matchedTiles.Add(new List<bool>(board.Width));
+                for (int x = 0; x < board.Width; x++)
                 {
                     matchedTiles[y].Add(false);
                 }
             }
 
-            for (int y = 0; y < board.Count; y++)
+            for (int y = 0; y < board.Height; y++)
             {
-                for (int x = 0; x < board[y].Count; x++)
+                for (int x = 0; x < board.Width; x++)
                 {
                     if (x > 1 &&
-                        board[y][x].Type == board[y][x - 1].Type &&
-                        board[y][x - 1].Type == board[y][x - 2].Type)
+                        board[x, y].Type == board[x - 1, y].Type &&
+                        board[x - 1, y].Type == board[x - 2, y].Type)
                     {
                         matchedTiles[y][x] = true;
                         matchedTiles[y][x - 1] = true;
@@ -31,8 +31,8 @@ namespace Gazeus.DesafioMatch3.Core
                     }
 
                     if (y > 1 &&
-                        board[y][x].Type == board[y - 1][x].Type &&
-                        board[y - 1][x].Type == board[y - 2][x].Type)
+                        board[x, y].Type == board[x, y - 1].Type &&
+                        board[x, y - 1].Type == board[x, y - 2].Type)
                     {
                         matchedTiles[y][x] = true;
                         matchedTiles[y - 1][x] = true;

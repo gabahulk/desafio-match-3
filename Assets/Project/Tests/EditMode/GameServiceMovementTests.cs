@@ -1,4 +1,5 @@
 using Gazeus.DesafioMatch3.Core;
+using Gazeus.DesafioMatch3.Models;
 using Gazeus.DesafioMatch3.Tests.EditMode.Fixtures;
 using NUnit.Framework;
 
@@ -9,15 +10,13 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         [Test]
         public void IsValidMovement_WhenAdjacentSwapCreatesNoMatch_ReturnsFalse()
         {
-            var service = new GameService();
-            var board = service.StartGame(4, 4);
-            BoardFixture.Apply(
-                board,
+            Board board = BoardFixture.Create(
                 "RGBY",
                 "GBYR",
                 "BYRG",
                 "YRBG"
             );
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
             bool result = service.IsValidMovement(0, 0, 1, 0);
 
@@ -27,15 +26,13 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         [Test]
         public void IsValidMovement_WhenSwapCreatesHorizontalMatch_ReturnsTrue()
         {
-            var service = new GameService();
-            var board = service.StartGame(4, 4);
-            BoardFixture.Apply(
-                board,
+            Board board = BoardFixture.Create(
                 "RGBY",
                 "GBYR",
                 "BYRG",
                 "RRGR"
             );
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
             bool result = service.IsValidMovement(2, 3, 3, 3);
 
@@ -45,15 +42,13 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         [Test]
         public void IsValidMovement_WhenSwapCreatesVerticalMatch_ReturnsTrue()
         {
-            var service = new GameService();
-            var board = service.StartGame(4, 4);
-            BoardFixture.Apply(
-                board,
+            Board board = BoardFixture.Create(
                 "RGBY",
                 "RBYG",
                 "GBRY",
                 "RYGB"
             );
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
             bool result = service.IsValidMovement(0, 2, 0, 3);
 

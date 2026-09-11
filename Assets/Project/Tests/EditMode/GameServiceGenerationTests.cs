@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Gazeus.DesafioMatch3.Core;
 using Gazeus.DesafioMatch3.Models;
 using NUnit.Framework;
@@ -13,13 +12,10 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         {
             var service = new GameService();
 
-            List<List<Tile>> board = service.StartGame(6, 6);
+            Board board = service.StartGame(6, 6);
 
-            Assert.That(board, Has.Count.EqualTo(6));
-            foreach (List<Tile> row in board)
-            {
-                Assert.That(row, Has.Count.EqualTo(6));
-            }
+            Assert.That(board.Width, Is.EqualTo(6));
+            Assert.That(board.Height, Is.EqualTo(6));
         }
 
         [Test]
@@ -27,14 +23,14 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         {
             var service = new GameService();
 
-            List<List<Tile>> board = service.StartGame(4, 3);
+            Board board = service.StartGame(4, 3);
 
             int expectedId = 0;
-            foreach (List<Tile> row in board)
+            for (int y = 0; y < board.Height; y++)
             {
-                foreach (Tile tile in row)
+                for (int x = 0; x < board.Width; x++)
                 {
-                    Assert.That(tile.Id, Is.EqualTo(expectedId));
+                    Assert.That(board[x, y].Id, Is.EqualTo(expectedId));
                     expectedId++;
                 }
             }
@@ -51,7 +47,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 for (int iteration = 0; iteration < 32; iteration++)
                 {
                     var service = new GameService();
-                    List<List<Tile>> board = service.StartGame(8, 8);
+                    Board board = service.StartGame(8, 8);
 
                     AssertBoardHasNoImmediateMatches(board, iteration);
                 }
@@ -62,17 +58,17 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             }
         }
 
-        private static void AssertBoardHasNoImmediateMatches(List<List<Tile>> board, int iteration)
+        private static void AssertBoardHasNoImmediateMatches(Board board, int iteration)
         {
-            for (int y = 0; y < board.Count; y++)
+            for (int y = 0; y < board.Height; y++)
             {
-                for (int x = 0; x < board[y].Count; x++)
+                for (int x = 0; x < board.Width; x++)
                 {
                     if (x >= 2)
                     {
                         bool hasHorizontalMatch =
-                            board[y][x].Type == board[y][x - 1].Type &&
-                            board[y][x - 1].Type == board[y][x - 2].Type;
+                            board[x, y].Type == board[x - 1, y].Type &&
+                            board[x - 1, y].Type == board[x - 2, y].Type;
 
                         Assert.That(
                             hasHorizontalMatch,
@@ -83,8 +79,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                     if (y >= 2)
                     {
                         bool hasVerticalMatch =
-                            board[y][x].Type == board[y - 1][x].Type &&
-                            board[y - 1][x].Type == board[y - 2][x].Type;
+                            board[x, y].Type == board[x, y - 1].Type &&
+                            board[x, y - 1].Type == board[x, y - 2].Type;
 
                         Assert.That(
                             hasVerticalMatch,
