@@ -9,7 +9,6 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 
         SpecialActivationResult Activate(
             Board board,
-            Vector2Int position,
-            SpecialActivationPhase phase);
+            SpecialActivationContext context);
     }
 }

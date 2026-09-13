@@ -14,10 +14,10 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 
         public SpecialActivationResult Activate(
             Board board,
-            Vector2Int position,
-            SpecialActivationPhase phase)
+            SpecialActivationContext context)
         {
             List<Vector2Int> affectedCells = new();
+            Vector2Int position = context.Position;
             SpecialType special = board[position.x, position.y].Special;
             if (special == SpecialType.HorizontalStriped)
             {

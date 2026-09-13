@@ -12,6 +12,28 @@ namespace Gazeus.DesafioMatch3.Core
             return GroupRuns(runs);
         }
 
+        public static MatchResult FindSwapMatch(Board board, Vector2Int from, Vector2Int to)
+        {
+            IReadOnlyList<MatchPattern> patterns = FindMatches(board);
+            if (patterns.Count > 0)
+            {
+                return new MatchResult(patterns, null);
+            }
+
+            Tile firstTile = board[from.x, from.y];
+            Tile secondTile = board[to.x, to.y];
+            bool isColorBombNormal =
+                (firstTile.Special == SpecialType.ColorBomb && IsNormalColorTile(secondTile)) ||
+                (secondTile.Special == SpecialType.ColorBomb && IsNormalColorTile(firstTile));
+            return new MatchResult(patterns,
+                isColorBombNormal ? new SpecialMatch(from, to) : null);
+        }
+
+        private static bool IsNormalColorTile(Tile tile)
+        {
+            return !tile.IsEmpty && tile.Special == SpecialType.None && tile.Color >= 0;
+        }
+
         private static List<MatchRun> FindRuns(Board board)
         {
             List<MatchRun> runs = new();

@@ -13,9 +13,9 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 
         public SpecialActivationResult Activate(
             Board board,
-            Vector2Int position,
-            SpecialActivationPhase phase)
+            SpecialActivationContext context)
         {
+            Vector2Int position = context.Position;
             List<Vector2Int> affectedCells = new();
             int minimumX = Mathf.Max(0, position.x - 1);
             int maximumX = Mathf.Min(board.Width - 1, position.x + 1);
@@ -30,7 +30,7 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
                 }
             }
 
-            bool isFirstActivation = phase == SpecialActivationPhase.First;
+            bool isFirstActivation = context.Phase == SpecialActivationPhase.First;
             PendingSpecialActivation pendingActivation = isFirstActivation
                 ? new PendingSpecialActivation(
                     board[position.x, position.y].Id,

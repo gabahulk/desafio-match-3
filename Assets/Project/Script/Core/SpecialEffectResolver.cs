@@ -10,7 +10,8 @@ namespace Gazeus.DesafioMatch3.Core
         private static readonly ISpecialEffect[] Effects =
         {
             new StripedEffect(),
-            new WrappedEffect()
+            new WrappedEffect(),
+            new ColorBombEffect()
         };
 
         internal static SpecialEffectResolution Expand(
@@ -20,7 +21,7 @@ namespace Gazeus.DesafioMatch3.Core
             IReadOnlyList<SpecialActivationInfo> initialActivations = null)
         {
             HashSet<Vector2Int> destructionCells = new(initialCells);
-            Queue<ActivationRequest> specialsToActivate = new();
+            Queue<SpecialActivationContext> specialsToActivate = new();
             HashSet<Vector2Int> queuedSpecials = new();
 
             for (int y = 0; y < board.Height; y++)
@@ -45,7 +46,7 @@ namespace Gazeus.DesafioMatch3.Core
             IReadOnlyList<PendingSpecialActivation> pendingActivations)
         {
             HashSet<Vector2Int> destructionCells = new();
-            Queue<ActivationRequest> specialsToActivate = new();
+            Queue<SpecialActivationContext> specialsToActivate = new();
             HashSet<Vector2Int> queuedSpecials = new();
 
             // Resolve each stable tile Id after gravity while retaining activation order.
@@ -56,7 +57,7 @@ namespace Gazeus.DesafioMatch3.Core
                 if (TryFindTile(board, pending.TileId, pending.Special, out Vector2Int position) &&
                     queuedSpecials.Add(position))
                 {
-                    specialsToActivate.Enqueue(new ActivationRequest(position, pending.Phase));
+                    specialsToActivate.Enqueue(new SpecialActivationContext(position, pending.Phase));
                 }
             }
 
@@ -64,11 +65,20 @@ namespace Gazeus.DesafioMatch3.Core
                 specialsToActivate, queuedSpecials, null);
         }
 
+        internal static SpecialEffectResolution ResolveActivation(Board board, SpecialActivationContext context)
+        {
+            Queue<SpecialActivationContext> specialsToActivate = new();
+            HashSet<Vector2Int> queuedSpecials = new() { context.Position };
+            specialsToActivate.Enqueue(context);
+            return ExpandQueued(board, new HashSet<Vector2Int>(), new HashSet<Vector2Int>(),
+                specialsToActivate, queuedSpecials, null);
+        }
+
         private static SpecialEffectResolution ExpandQueued(
             Board board,
             HashSet<Vector2Int> destructionCells,
             IReadOnlyCollection<Vector2Int> protectedCells,
-            Queue<ActivationRequest> specialsToActivate,
+            Queue<SpecialActivationContext> specialsToActivate,
             HashSet<Vector2Int> queuedSpecials,
             IReadOnlyList<SpecialActivationInfo> initialActivations)
         {
@@ -81,7 +91,7 @@ namespace Gazeus.DesafioMatch3.Core
 
             while (specialsToActivate.Count > 0)
             {
-                ActivationRequest request = specialsToActivate.Dequeue();
+                SpecialActivationContext request = specialsToActivate.Dequeue();
                 if (!activatedSpecials.Add(request.Position))
                 {
                     continue;
@@ -99,11 +109,11 @@ namespace Gazeus.DesafioMatch3.Core
                     Special = special,
                     Position = request.Position,
                     Phase = request.Phase,
-                    TargetColor = null
+                    TargetColor = request.TargetColor
                 });
 
                 SpecialActivationResult activation = effect.Activate(
-                    board, request.Position, request.Phase);
+                    board, request);
                 if (activation.PreserveSource)
                 {
                     preservedSourceCells.Add(request.Position);
@@ -144,7 +154,7 @@ namespace Gazeus.DesafioMatch3.Core
             IReadOnlyCollection<Vector2Int> protectedCells,
             IReadOnlyCollection<Vector2Int> preservedSourceCells,
             HashSet<Vector2Int> destructionCells,
-            Queue<ActivationRequest> specialsToActivate,
+            Queue<SpecialActivationContext> specialsToActivate,
             HashSet<Vector2Int> queuedSpecials)
         {
             if (Contains(protectedCells, position) || Contains(preservedSourceCells, position))
@@ -161,13 +171,13 @@ namespace Gazeus.DesafioMatch3.Core
             Board board,
             Vector2Int position,
             SpecialActivationPhase phase,
-            Queue<ActivationRequest> specialsToActivate,
+            Queue<SpecialActivationContext> specialsToActivate,
             HashSet<Vector2Int> queuedSpecials)
         {
             SpecialType special = board[position.x, position.y].Special;
-            if (FindEffect(special) != null && queuedSpecials.Add(position))
+            if (special != SpecialType.ColorBomb && FindEffect(special) != null && queuedSpecials.Add(position))
             {
-                specialsToActivate.Enqueue(new ActivationRequest(position, phase));
+                specialsToActivate.Enqueue(new SpecialActivationContext(position, phase));
             }
         }
 
@@ -207,16 +217,5 @@ namespace Gazeus.DesafioMatch3.Core
             return false;
         }
 
-        private readonly struct ActivationRequest
-        {
-            internal Vector2Int Position { get; }
-            internal SpecialActivationPhase Phase { get; }
-
-            internal ActivationRequest(Vector2Int position, SpecialActivationPhase phase)
-            {
-                Position = position;
-                Phase = phase;
-            }
-        }
     }
 }

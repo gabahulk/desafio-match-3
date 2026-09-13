@@ -11,6 +11,47 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
     public sealed class ColorBombTests
     {
         [Test]
+        public void FindSwapMatch_ColorBombAndNormal_ReturnsSpecialMatchWithoutPatterns()
+        {
+            Board board = CreateColorBombBoard();
+            (board[0, 0], board[1, 0]) = (board[1, 0], board[0, 0]);
+
+            MatchResult result = MatchFinder.FindSwapMatch(board,
+                new Vector2Int(0, 0), new Vector2Int(1, 0));
+
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.StandardPatterns, Is.Empty);
+            Assert.That(result.SpecialMatch, Is.Not.Null);
+        }
+
+        [Test]
+        public void FindSwapMatch_NormalAndColorBomb_ReturnsSpecialMatchWithoutPatterns()
+        {
+            Board board = CreateColorBombBoard();
+            (board[0, 0], board[1, 0]) = (board[1, 0], board[0, 0]);
+
+            MatchResult result = MatchFinder.FindSwapMatch(board,
+                new Vector2Int(1, 0), new Vector2Int(0, 0));
+
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.StandardPatterns, Is.Empty);
+            Assert.That(result.SpecialMatch, Is.Not.Null);
+        }
+
+        [Test]
+        public void FindSwapMatch_OrdinaryInvalidSwap_ReturnsNoMatch()
+        {
+            Board board = BoardFixture.Create("RGB", "GBY", "BYR");
+            (board[0, 0], board[1, 0]) = (board[1, 0], board[0, 0]);
+
+            MatchResult result = MatchFinder.FindSwapMatch(board,
+                new Vector2Int(0, 0), new Vector2Int(1, 0));
+
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.SpecialMatch, Is.Null);
+        }
+
+        [Test]
         public void TrySwap_ColorBombAndNormal_IsValidAndReportsTargetColor()
         {
             Board board = CreateColorBombBoard();
@@ -53,6 +94,22 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 Does.Contain(new Vector2Int(4, 2)));
             Assert.That(result.BoardSequences[0].SpecialActivations.Any(info =>
                 info.Special == SpecialType.HorizontalStriped && info.Position == new Vector2Int(2, 2)), Is.True);
+        }
+
+        [Test]
+        public void TrySwap_ColorBombHitsTargetColoredWrapped_UsesBothWrappedPhases()
+        {
+            Board board = CreateColorBombBoard();
+            board[2, 2].Color = 1;
+            board[2, 2].Special = SpecialType.Wrapped;
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
+
+            Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations).Any(info =>
+                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.First), Is.True);
+            Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations).Any(info =>
+                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.Second), Is.True);
         }
 
         [Test]
