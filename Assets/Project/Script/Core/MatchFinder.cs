@@ -14,19 +14,22 @@ namespace Gazeus.DesafioMatch3.Core
 
         public static MatchResult FindSwapMatch(Board board, Vector2Int from, Vector2Int to)
         {
-            IReadOnlyList<MatchPattern> patterns = FindMatches(board);
-            if (patterns.Count > 0)
-            {
-                return new MatchResult(patterns, null);
-            }
-
             Tile firstTile = board[from.x, from.y];
             Tile secondTile = board[to.x, to.y];
+            if (firstTile.Special != SpecialType.None && secondTile.Special != SpecialType.None)
+            {
+                return new MatchResult(System.Array.Empty<MatchPattern>(), new SpecialMatch(from, to));
+            }
+
             bool isColorBombNormal =
                 (firstTile.Special == SpecialType.ColorBomb && IsNormalColorTile(secondTile)) ||
                 (secondTile.Special == SpecialType.ColorBomb && IsNormalColorTile(firstTile));
-            return new MatchResult(patterns,
-                isColorBombNormal ? new SpecialMatch(from, to) : null);
+            if (isColorBombNormal)
+            {
+                return new MatchResult(System.Array.Empty<MatchPattern>(), new SpecialMatch(from, to));
+            }
+
+            return new MatchResult(FindMatches(board), null);
         }
 
         private static bool IsNormalColorTile(Tile tile)

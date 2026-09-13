@@ -10,6 +10,26 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 {
     public sealed class ColorBombTests
     {
+        [TestCase(SpecialType.HorizontalStriped, SpecialType.VerticalStriped)]
+        [TestCase(SpecialType.HorizontalStriped, SpecialType.Wrapped)]
+        [TestCase(SpecialType.Wrapped, SpecialType.Wrapped)]
+        [TestCase(SpecialType.ColorBomb, SpecialType.HorizontalStriped)]
+        [TestCase(SpecialType.ColorBomb, SpecialType.Wrapped)]
+        [TestCase(SpecialType.ColorBomb, SpecialType.ColorBomb)]
+        public void FindSwapMatch_SupportedSpecialPair_ReturnsSpecialMatch(
+            SpecialType first, SpecialType second)
+        {
+            Board board = CreateSpecialPairBoard(first, second);
+            (board[0, 0], board[1, 0]) = (board[1, 0], board[0, 0]);
+
+            MatchResult result = MatchFinder.FindSwapMatch(board,
+                new Vector2Int(0, 0), new Vector2Int(1, 0));
+
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.SpecialMatch, Is.Not.Null);
+            Assert.That(result.StandardPatterns, Is.Empty);
+        }
+
         [Test]
         public void FindSwapMatch_ColorBombAndNormal_ReturnsSpecialMatchWithoutPatterns()
         {
@@ -49,6 +69,21 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             Assert.That(result.IsValid, Is.False);
             Assert.That(result.SpecialMatch, Is.Null);
+        }
+
+        [Test]
+        public void FindSwapMatch_SpecialPairTakesPrecedenceOverGeometricPattern()
+        {
+            Board board = CreateSpecialPairBoard(SpecialType.HorizontalStriped, SpecialType.Wrapped);
+            board[1, 0].Color = 0;
+            board[2, 0].Color = 0;
+            (board[0, 0], board[1, 0]) = (board[1, 0], board[0, 0]);
+
+            MatchResult result = MatchFinder.FindSwapMatch(board,
+                new Vector2Int(0, 0), new Vector2Int(1, 0));
+
+            Assert.That(result.SpecialMatch, Is.Not.Null);
+            Assert.That(result.StandardPatterns, Is.Empty);
         }
 
         [Test]
@@ -113,6 +148,66 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
+        public void TrySwap_StripedAndWrapped_ActivatesBothAndCompletesWrappedSecondPhase()
+        {
+            Board board = CreateSpecialPairBoard(SpecialType.HorizontalStriped, SpecialType.Wrapped);
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
+
+            Assert.That(result.BoardSequences[0].SpecialActivations.Any(info =>
+                info.Special == SpecialType.HorizontalStriped), Is.True);
+            Assert.That(result.BoardSequences[0].SpecialActivations.Any(info =>
+                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.First), Is.True);
+            Assert.That(result.BoardSequences.Skip(1).SelectMany(sequence => sequence.SpecialActivations).Any(info =>
+                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.Second), Is.True);
+        }
+
+        [Test]
+        public void TrySwap_WrappedAndWrapped_QueuesTwoIndependentSecondPhases()
+        {
+            Board board = CreateSpecialPairBoard(SpecialType.Wrapped, SpecialType.Wrapped);
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
+
+            Assert.That(result.BoardSequences[0].SpecialActivations.Count(info =>
+                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.First), Is.EqualTo(2));
+            Assert.That(result.BoardSequences.Skip(1).SelectMany(sequence => sequence.SpecialActivations).Count(info =>
+                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.Second), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TrySwap_TwoColorBombs_ClearBoardWithoutActivatingIndirectBomb()
+        {
+            Board board = CreateSpecialPairBoard(SpecialType.ColorBomb, SpecialType.ColorBomb);
+            board[2, 0].Special = SpecialType.ColorBomb;
+            board[2, 0].Color = -1;
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
+
+            BoardSequence first = result.BoardSequences[0];
+            Assert.That(first.MatchedPosition, Has.Count.EqualTo(board.Width * board.Height));
+            Assert.That(first.SpecialActivations.Count(info => info.Special == SpecialType.ColorBomb), Is.EqualTo(2));
+        }
+
+        [TestCase(SpecialType.HorizontalStriped)]
+        [TestCase(SpecialType.Wrapped)]
+        public void TrySwap_ColorBombAndSpecial_UsesSpecialColorAndActivatesSpecialOnce(SpecialType special)
+        {
+            Board board = CreateSpecialPairBoard(SpecialType.ColorBomb, special);
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
+
+            BoardSequence first = result.BoardSequences[0];
+            Assert.That(first.SpecialActivations.Single(info => info.Special == SpecialType.ColorBomb).TargetColor,
+                Is.EqualTo(1));
+            Assert.That(first.SpecialActivations.Count(info => info.Special == special), Is.EqualTo(1));
+        }
+
+        [Test]
         public void TrySwap_IndirectlyHitColorBomb_IsDestroyedWithoutColorBombActivation()
         {
             Board board = BoardFixture.Create("RGBYG", "GBYRG", "RRRBG");
@@ -133,6 +228,16 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Board board = BoardFixture.Create("RGBYB", "BRYGB", "YBGRY", "GBYRG");
             board[0, 0].Special = SpecialType.ColorBomb;
             board[0, 0].Color = -1;
+            return board;
+        }
+
+        private static Board CreateSpecialPairBoard(SpecialType first, SpecialType second)
+        {
+            Board board = BoardFixture.Create("RGBYB", "BRYGB", "YBGRY", "GBYRG");
+            board[0, 0].Special = first;
+            board[0, 0].Color = first == SpecialType.ColorBomb ? -1 : 0;
+            board[1, 0].Special = second;
+            board[1, 0].Color = second == SpecialType.ColorBomb ? -1 : 1;
             return board;
         }
 

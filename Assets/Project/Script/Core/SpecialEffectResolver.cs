@@ -65,11 +65,59 @@ namespace Gazeus.DesafioMatch3.Core
                 specialsToActivate, queuedSpecials, null);
         }
 
-        internal static SpecialEffectResolution ResolveActivation(Board board, SpecialActivationContext context)
+        internal static IReadOnlyList<SpecialActivationContext> CreateSpecialMatchActivations(
+            Board board,
+            SpecialMatch specialMatch)
+        {
+            Tile first = board[specialMatch.FirstPosition.x, specialMatch.FirstPosition.y];
+            Tile second = board[specialMatch.SecondPosition.x, specialMatch.SecondPosition.y];
+            List<SpecialActivationContext> contexts = new();
+
+            if (first.Special == SpecialType.ColorBomb && second.Special == SpecialType.ColorBomb)
+            {
+                contexts.Add(new SpecialActivationContext(specialMatch.FirstPosition, SpecialActivationPhase.First));
+                contexts.Add(new SpecialActivationContext(specialMatch.SecondPosition, SpecialActivationPhase.First));
+                return contexts;
+            }
+
+            if (first.Special == SpecialType.ColorBomb || second.Special == SpecialType.ColorBomb)
+            {
+                Tile other = first.Special == SpecialType.ColorBomb ? second : first;
+                Vector2Int bombPosition = first.Special == SpecialType.ColorBomb
+                    ? specialMatch.FirstPosition
+                    : specialMatch.SecondPosition;
+                contexts.Add(new SpecialActivationContext(bombPosition, SpecialActivationPhase.First, other.Color));
+                if (other.Special != SpecialType.None)
+                {
+                    Vector2Int otherPosition = first.Special == SpecialType.ColorBomb
+                        ? specialMatch.SecondPosition
+                        : specialMatch.FirstPosition;
+                    contexts.Add(new SpecialActivationContext(otherPosition, SpecialActivationPhase.First));
+                }
+
+                return contexts;
+            }
+
+            contexts.Add(new SpecialActivationContext(specialMatch.FirstPosition, SpecialActivationPhase.First));
+            contexts.Add(new SpecialActivationContext(specialMatch.SecondPosition, SpecialActivationPhase.First));
+            return contexts;
+        }
+
+        internal static SpecialEffectResolution ResolveActivations(
+            Board board,
+            IReadOnlyList<SpecialActivationContext> contexts)
         {
             Queue<SpecialActivationContext> specialsToActivate = new();
-            HashSet<Vector2Int> queuedSpecials = new() { context.Position };
-            specialsToActivate.Enqueue(context);
+            HashSet<Vector2Int> queuedSpecials = new();
+            for (int index = 0; index < contexts.Count; index++)
+            {
+                SpecialActivationContext context = contexts[index];
+                if (queuedSpecials.Add(context.Position))
+                {
+                    specialsToActivate.Enqueue(context);
+                }
+            }
+
             return ExpandQueued(board, new HashSet<Vector2Int>(), new HashSet<Vector2Int>(),
                 specialsToActivate, queuedSpecials, null);
         }

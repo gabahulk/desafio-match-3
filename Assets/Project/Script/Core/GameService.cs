@@ -53,7 +53,9 @@ namespace Gazeus.DesafioMatch3.Core
             SpecialSpawnContext context = SpecialSpawnContext.FromSwap(
                 from, to);
             List<BoardSequence> boardSequences = Resolve(candidateBoard, matchResult.StandardPatterns, context,
-                CreateSpecialActivationContext(candidateBoard, matchResult.SpecialMatch));
+                matchResult.SpecialMatch == null
+                    ? null
+                    : SpecialEffectResolver.CreateSpecialMatchActivations(candidateBoard, matchResult.SpecialMatch));
             _board = candidateBoard;
 
             return new MoveResult(true, boardSequences);
@@ -63,17 +65,17 @@ namespace Gazeus.DesafioMatch3.Core
             Board board,
             IReadOnlyList<MatchPattern> patterns,
             SpecialSpawnContext context,
-            SpecialActivationContext initialActivation = null)
+            IReadOnlyList<SpecialActivationContext> initialActivations = null)
         {
             List<BoardSequence> boardSequences = new();
             IReadOnlyList<PendingSpecialActivation> pendingActivations =
                 Array.Empty<PendingSpecialActivation>();
 
-            while (patterns.Count > 0 || pendingActivations.Count > 0 || initialActivation != null)
+            while (patterns.Count > 0 || pendingActivations.Count > 0 || initialActivations != null)
             {
                 List<SpecialTileInfo> createdSpecialTiles = new();
                 HashSet<Vector2Int> protectedCells = new();
-                if (pendingActivations.Count == 0 && initialActivation == null)
+                if (pendingActivations.Count == 0 && initialActivations == null)
                 {
                     for (int patternIndex = 0; patternIndex < patterns.Count; patternIndex++)
                     {
@@ -100,9 +102,9 @@ namespace Gazeus.DesafioMatch3.Core
                         board,
                         pendingActivations);
                 }
-                else if (initialActivation != null)
+                else if (initialActivations != null)
                 {
-                    effectResolution = SpecialEffectResolver.ResolveActivation(board, initialActivation);
+                    effectResolution = SpecialEffectResolver.ResolveActivations(board, initialActivations);
                 }
                 else
                 {
@@ -110,7 +112,7 @@ namespace Gazeus.DesafioMatch3.Core
                         BuildMatchedCells(patterns, protectedCells), protectedCells);
                 }
 
-                initialActivation = null;
+                initialActivations = null;
 
                 HashSet<Vector2Int> destructionCells = effectResolution.DestructionCells;
                 pendingActivations = effectResolution.PendingActivations;
@@ -241,23 +243,6 @@ namespace Gazeus.DesafioMatch3.Core
             return matchedCells;
         }
 
-        private static SpecialActivationContext CreateSpecialActivationContext(
-            Board board,
-            SpecialMatch specialMatch)
-        {
-            if (specialMatch == null)
-            {
-                return null;
-            }
-
-            Tile first = board[specialMatch.FirstPosition.x, specialMatch.FirstPosition.y];
-            Tile second = board[specialMatch.SecondPosition.x, specialMatch.SecondPosition.y];
-            Vector2Int bombPosition = first.Special == SpecialType.ColorBomb
-                ? specialMatch.FirstPosition
-                : specialMatch.SecondPosition;
-            int targetColor = first.Special == SpecialType.ColorBomb ? second.Color : first.Color;
-            return new SpecialActivationContext(bombPosition, SpecialActivationPhase.First, targetColor);
-        }
 
         private static int GetNextTileId(Board board)
         {

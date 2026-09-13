@@ -11,19 +11,20 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
         public SpecialActivationResult Activate(Board board, SpecialActivationContext context)
         {
             List<Vector2Int> affectedCells = new() { context.Position };
-            if (!context.TargetColor.HasValue)
-            {
-                return new SpecialActivationResult(affectedCells, false, null);
-            }
 
             for (int y = 0; y < board.Height; y++)
             {
                 for (int x = 0; x < board.Width; x++)
                 {
                     Tile tile = board[x, y];
-                    if (!tile.IsEmpty && tile.Color == context.TargetColor.Value)
+                    if (!tile.IsEmpty &&
+                        (!context.TargetColor.HasValue || tile.Color == context.TargetColor.Value))
                     {
-                        affectedCells.Add(new Vector2Int(x, y));
+                        Vector2Int position = new(x, y);
+                        if (position != context.Position)
+                        {
+                            affectedCells.Add(position);
+                        }
                     }
                 }
             }
