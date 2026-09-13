@@ -104,7 +104,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
-        public void TrySwap_MatchFive_CreatesNoSpecialAndDestroysAllFiveCells()
+        public void TrySwap_MatchFive_CreatesColorBombAndPreservesItsCell()
         {
             Board board = BoardFixture.Create(
                 "RGBYR",
@@ -118,8 +118,10 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             MoveResult result = TrySwapDeterministically(service, 2, 4, 2, 3);
 
             BoardSequence sequence = result.BoardSequences[0];
-            Assert.That(sequence.CreatedSpecialTiles, Is.Empty);
-            Assert.That(sequence.MatchedPosition, Has.Count.EqualTo(5));
+            Assert.That(sequence.CreatedSpecialTiles, Has.Count.EqualTo(1));
+            Assert.That(sequence.CreatedSpecialTiles[0].Special, Is.EqualTo(SpecialType.ColorBomb));
+            Assert.That(sequence.CreatedSpecialTiles[0].Color, Is.EqualTo(-1));
+            Assert.That(sequence.MatchedPosition, Has.Count.EqualTo(4));
         }
 
         [Test]

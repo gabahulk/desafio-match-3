@@ -1,6 +1,6 @@
 namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 {
-    internal enum SpecialActivationPhase
+    public enum SpecialActivationPhase
     {
         First,
         Second

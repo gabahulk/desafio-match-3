@@ -16,7 +16,8 @@ namespace Gazeus.DesafioMatch3.Core
         internal static SpecialEffectResolution Expand(
             Board board,
             HashSet<Vector2Int> initialCells,
-            IReadOnlyCollection<Vector2Int> protectedCells)
+            IReadOnlyCollection<Vector2Int> protectedCells,
+            IReadOnlyList<SpecialActivationInfo> initialActivations = null)
         {
             HashSet<Vector2Int> destructionCells = new(initialCells);
             Queue<ActivationRequest> specialsToActivate = new();
@@ -36,7 +37,7 @@ namespace Gazeus.DesafioMatch3.Core
             }
 
             return ExpandQueued(board, destructionCells, protectedCells,
-                specialsToActivate, queuedSpecials);
+                specialsToActivate, queuedSpecials, initialActivations);
         }
 
         internal static SpecialEffectResolution ResolvePending(
@@ -60,7 +61,7 @@ namespace Gazeus.DesafioMatch3.Core
             }
 
             return ExpandQueued(board, destructionCells, new HashSet<Vector2Int>(),
-                specialsToActivate, queuedSpecials);
+                specialsToActivate, queuedSpecials, null);
         }
 
         private static SpecialEffectResolution ExpandQueued(
@@ -68,9 +69,13 @@ namespace Gazeus.DesafioMatch3.Core
             HashSet<Vector2Int> destructionCells,
             IReadOnlyCollection<Vector2Int> protectedCells,
             Queue<ActivationRequest> specialsToActivate,
-            HashSet<Vector2Int> queuedSpecials)
+            HashSet<Vector2Int> queuedSpecials,
+            IReadOnlyList<SpecialActivationInfo> initialActivations)
         {
             List<PendingSpecialActivation> pendingActivations = new();
+            List<SpecialActivationInfo> activations = initialActivations != null
+                ? new List<SpecialActivationInfo>(initialActivations)
+                : new List<SpecialActivationInfo>();
             HashSet<Vector2Int> preservedSourceCells = new();
             HashSet<Vector2Int> activatedSpecials = new();
 
@@ -88,6 +93,14 @@ namespace Gazeus.DesafioMatch3.Core
                 {
                     continue;
                 }
+
+                activations.Add(new SpecialActivationInfo
+                {
+                    Special = special,
+                    Position = request.Position,
+                    Phase = request.Phase,
+                    TargetColor = null
+                });
 
                 SpecialActivationResult activation = effect.Activate(
                     board, request.Position, request.Phase);
@@ -109,7 +122,7 @@ namespace Gazeus.DesafioMatch3.Core
                 }
             }
 
-            return new SpecialEffectResolution(destructionCells, pendingActivations);
+            return new SpecialEffectResolution(destructionCells, pendingActivations, activations);
         }
 
         private static ISpecialEffect FindEffect(SpecialType special)

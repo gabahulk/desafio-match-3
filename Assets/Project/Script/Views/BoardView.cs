@@ -39,10 +39,9 @@ namespace Gazeus.DesafioMatch3.Views
 
                     _tileSpots[y][x] = tileSpot;
 
-                    int colorIndex = board[x, y].Color;
                     if (!board[x, y].IsEmpty)
                     {
-                        GameObject tilePrefab = _tilePrefabRepository.ColorPrefabList[colorIndex];
+                        GameObject tilePrefab = GetTilePrefab(board[x, y]);
                         GameObject tile = Instantiate(tilePrefab);
                         tileSpot.SetTile(tile);
                         ApplySpecialVisual(tile, board[x, y].Special);
@@ -96,6 +95,27 @@ namespace Gazeus.DesafioMatch3.Views
             }
 
             return DOVirtual.DelayedCall(0.2f, () => { });
+        }
+
+        public Tween PlaySpecialActivations(List<SpecialActivationInfo> activations)
+        {
+            Sequence sequence = DOTween.Sequence();
+            for (int index = 0; index < activations.Count; index++)
+            {
+                SpecialActivationInfo activation = activations[index];
+                if (activation.Special != SpecialType.ColorBomb)
+                {
+                    continue;
+                }
+
+                GameObject tile = _tiles[activation.Position.y][activation.Position.x];
+                if (tile != null)
+                {
+                    sequence.Join(tile.transform.DOPunchScale(Vector3.one * 0.2f, 0.2f, 4));
+                }
+            }
+
+            return sequence;
         }
 
         public Tween MoveTiles(List<MovedTileInfo> movedTiles)
@@ -158,6 +178,12 @@ namespace Gazeus.DesafioMatch3.Views
                 return;
             }
 
+            if (special == SpecialType.ColorBomb)
+            {
+                CreateColorBombOverlay(tile, overlayName);
+                return;
+            }
+
             if (special != SpecialType.HorizontalStriped &&
                 special != SpecialType.VerticalStriped)
             {
@@ -185,6 +211,27 @@ namespace Gazeus.DesafioMatch3.Views
             Image stripe = overlay.GetComponent<Image>();
             stripe.color = new Color(1.0f, 1.0f, 1.0f, 0.85f);
             stripe.raycastTarget = false;
+        }
+
+        private GameObject GetTilePrefab(Tile tile)
+        {
+            int colorIndex = tile.Special == SpecialType.ColorBomb ? 0 : tile.Color;
+            return _tilePrefabRepository.ColorPrefabList[colorIndex];
+        }
+
+        private static void CreateColorBombOverlay(GameObject tile, string overlayName)
+        {
+            GameObject overlay = new(overlayName, typeof(RectTransform), typeof(Image));
+            RectTransform rect = (RectTransform)overlay.transform;
+            rect.SetParent(tile.transform, false);
+            rect.anchorMin = new Vector2(0.18f, 0.18f);
+            rect.anchorMax = new Vector2(0.82f, 0.82f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            Image image = overlay.GetComponent<Image>();
+            image.color = new Color(0.18f, 0.08f, 0.35f, 1.0f);
+            image.raycastTarget = false;
         }
 
         private static void CreateWrappedOverlay(GameObject tile, string overlayName)

@@ -42,16 +42,22 @@ namespace Gazeus.DesafioMatch3.Core
             (candidateBoard[toX, toY], candidateBoard[fromX, fromY]) =
                 (candidateBoard[fromX, fromY], candidateBoard[toX, toY]);
 
-            IReadOnlyList<MatchPattern> patterns = MatchFinder.FindMatches(candidateBoard);
-            if (patterns.Count == 0)
+            Vector2Int from = new(fromX, fromY);
+            Vector2Int to = new(toX, toY);
+            bool hasSpecialSwap = SpecialSwapResolver.TryResolve(candidateBoard, from, to,
+                out SpecialSwapResolution specialSwap);
+            IReadOnlyList<MatchPattern> patterns = hasSpecialSwap
+                ? Array.Empty<MatchPattern>()
+                : MatchFinder.FindMatches(candidateBoard);
+            if (!hasSpecialSwap && patterns.Count == 0)
             {
                 return new MoveResult(false, Array.Empty<BoardSequence>());
             }
 
             SpecialSpawnContext context = SpecialSpawnContext.FromSwap(
-                new Vector2Int(fromX, fromY),
-                new Vector2Int(toX, toY));
-            List<BoardSequence> boardSequences = Resolve(candidateBoard, patterns, context);
+                from, to);
+            List<BoardSequence> boardSequences = Resolve(candidateBoard, patterns, context,
+                specialSwap?.InitialCells, specialSwap == null ? null : new[] { specialSwap.Activation });
             _board = candidateBoard;
 
             return new MoveResult(true, boardSequences);
@@ -60,17 +66,19 @@ namespace Gazeus.DesafioMatch3.Core
         private List<BoardSequence> Resolve(
             Board board,
             IReadOnlyList<MatchPattern> patterns,
-            SpecialSpawnContext context)
+            SpecialSpawnContext context,
+            HashSet<Vector2Int> initialCells = null,
+            IReadOnlyList<SpecialActivationInfo> initialActivations = null)
         {
             List<BoardSequence> boardSequences = new();
             IReadOnlyList<PendingSpecialActivation> pendingActivations =
                 Array.Empty<PendingSpecialActivation>();
 
-            while (patterns.Count > 0 || pendingActivations.Count > 0)
+            while (patterns.Count > 0 || pendingActivations.Count > 0 || initialCells != null)
             {
                 List<SpecialTileInfo> createdSpecialTiles = new();
                 HashSet<Vector2Int> protectedCells = new();
-                if (pendingActivations.Count == 0)
+                if (pendingActivations.Count == 0 && initialCells == null)
                 {
                     for (int patternIndex = 0; patternIndex < patterns.Count; patternIndex++)
                     {
@@ -99,14 +107,17 @@ namespace Gazeus.DesafioMatch3.Core
                 }
                 else
                 {
-                    HashSet<Vector2Int> matchedCells = BuildMatchedCells(
-                        patterns,
-                        protectedCells);
+                    HashSet<Vector2Int> matchedCells = initialCells ?? BuildMatchedCells(
+                        patterns, protectedCells);
                     effectResolution = SpecialEffectResolver.Expand(
                         board,
                         matchedCells,
-                        protectedCells);
+                        protectedCells,
+                        initialActivations);
                 }
+
+                initialCells = null;
+                initialActivations = null;
 
                 HashSet<Vector2Int> destructionCells = effectResolution.DestructionCells;
                 pendingActivations = effectResolution.PendingActivations;
@@ -203,7 +214,8 @@ namespace Gazeus.DesafioMatch3.Core
                     MatchedPosition = matchedPosition,
                     MovedTiles = movedTilesList,
                     AddedTiles = addedTiles,
-                    CreatedSpecialTiles = createdSpecialTiles
+                    CreatedSpecialTiles = createdSpecialTiles,
+                    SpecialActivations = new List<SpecialActivationInfo>(effectResolution.Activations)
                 };
                 boardSequences.Add(sequence);
                 context = SpecialSpawnContext.FromCascade(movedTilesList, addedTiles);

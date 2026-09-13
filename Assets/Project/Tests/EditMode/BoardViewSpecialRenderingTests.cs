@@ -53,8 +53,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 board[2, 0] = new Tile
                 {
                     Id = 2,
-                    Color = 0,
-                    Special = SpecialType.Wrapped
+                    Color = -1,
+                    Special = SpecialType.ColorBomb
                 };
 
                 boardView.CreateBoard(board);
@@ -62,7 +62,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                     FindDescendant(root.transform, "HorizontalStriped Overlay"),
                     Is.Not.Null);
                 Assert.That(
-                    FindDescendant(root.transform, "Wrapped Overlay"),
+                    FindDescendant(root.transform, "ColorBomb Overlay"),
                     Is.Not.Null);
 
                 boardView.ApplyCreatedSpecials(new List<SpecialTileInfo>

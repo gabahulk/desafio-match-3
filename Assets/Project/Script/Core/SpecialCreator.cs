@@ -12,8 +12,6 @@ namespace Gazeus.DesafioMatch3.Core
             SpecialSpawnContext context,
             IReadOnlyCollection<Vector2Int> alreadyProtectedCells)
         {
-            // Straight-5 remains semantically eligible but has no concrete mapping until
-            // Color Bomb gameplay is implemented.
             if (!TryGetSpecialType(pattern, context, out SpecialType special))
             {
                 return new SpecialCreationResult(
@@ -35,6 +33,10 @@ namespace Gazeus.DesafioMatch3.Core
 
             Tile spawnTile = board[spawnPosition.x, spawnPosition.y];
             spawnTile.Special = special;
+            if (special == SpecialType.ColorBomb)
+            {
+                spawnTile.Color = -1;
+            }
 
             return new SpecialCreationResult(
                 new List<SpecialTileInfo>
@@ -54,6 +56,12 @@ namespace Gazeus.DesafioMatch3.Core
             SpecialSpawnContext context,
             out SpecialType special)
         {
+            if (pattern.Shape == MatchShape.Straight && pattern.Size >= 5)
+            {
+                special = SpecialType.ColorBomb;
+                return true;
+            }
+
             if (pattern.Shape == MatchShape.Straight && pattern.Size == 4)
             {
                 special = context.IsPlayerSwap

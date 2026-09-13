@@ -104,10 +104,13 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 result.BoardSequences,
                 new Vector2Int(0, 4),
                 new Vector2Int(1, 4),
-                new Vector2Int(2, 4),
                 new Vector2Int(3, 4),
                 new Vector2Int(4, 4));
-            Assert.That(result.BoardSequences[0].CreatedSpecialTiles, Is.Empty);
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles, Has.Count.EqualTo(1));
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles[0].Position,
+                Is.EqualTo(new Vector2Int(2, 4)));
+            Assert.That(result.BoardSequences[0].CreatedSpecialTiles[0].Special,
+                Is.EqualTo(SpecialType.ColorBomb));
         }
 
         [Test]
