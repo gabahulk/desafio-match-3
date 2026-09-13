@@ -11,7 +11,13 @@ namespace Gazeus.DesafioMatch3.Core
         {
             new StripedEffect(),
             new WrappedEffect(),
-            new ColorBombEffect()
+            new ColorBombEffect(),
+            new StripedStripedEffect(),
+            new StripedWrappedEffect(),
+            new WrappedWrappedEffect(),
+            new ColorBombStripedEffect(),
+            new ColorBombWrappedEffect(),
+            new ColorBombColorBombEffect()
         };
 
         internal static SpecialEffectResolution Expand(
@@ -57,7 +63,8 @@ namespace Gazeus.DesafioMatch3.Core
                 if (TryFindTile(board, pending.TileId, pending.Special, out Vector2Int position) &&
                     queuedSpecials.Add(position))
                 {
-                    specialsToActivate.Enqueue(new SpecialActivationContext(position, pending.Phase));
+                    specialsToActivate.Enqueue(new SpecialActivationContext(position, pending.Phase,
+                        special: pending.Special, combinedWith: pending.CombinedWith));
                 }
             }
 
@@ -73,33 +80,26 @@ namespace Gazeus.DesafioMatch3.Core
             Tile second = board[specialMatch.SecondPosition.x, specialMatch.SecondPosition.y];
             List<SpecialActivationContext> contexts = new();
 
-            if (first.Special == SpecialType.ColorBomb && second.Special == SpecialType.ColorBomb)
-            {
-                contexts.Add(new SpecialActivationContext(specialMatch.FirstPosition, SpecialActivationPhase.First));
-                contexts.Add(new SpecialActivationContext(specialMatch.SecondPosition, SpecialActivationPhase.First));
-                return contexts;
-            }
-
-            if (first.Special == SpecialType.ColorBomb || second.Special == SpecialType.ColorBomb)
+            Vector2Int center = specialMatch.SecondPosition;
+            if (first.Special == SpecialType.ColorBomb && second.Special == SpecialType.None ||
+                second.Special == SpecialType.ColorBomb && first.Special == SpecialType.None)
             {
                 Tile other = first.Special == SpecialType.ColorBomb ? second : first;
-                Vector2Int bombPosition = first.Special == SpecialType.ColorBomb
-                    ? specialMatch.FirstPosition
-                    : specialMatch.SecondPosition;
-                contexts.Add(new SpecialActivationContext(bombPosition, SpecialActivationPhase.First, other.Color));
-                if (other.Special != SpecialType.None)
-                {
-                    Vector2Int otherPosition = first.Special == SpecialType.ColorBomb
-                        ? specialMatch.SecondPosition
-                        : specialMatch.FirstPosition;
-                    contexts.Add(new SpecialActivationContext(otherPosition, SpecialActivationPhase.First));
-                }
-
+                Vector2Int bomb = first.Special == SpecialType.ColorBomb ? specialMatch.FirstPosition : specialMatch.SecondPosition;
+                contexts.Add(new SpecialActivationContext(bomb, SpecialActivationPhase.First, other.Color,
+                    SpecialType.ColorBomb));
                 return contexts;
             }
 
-            contexts.Add(new SpecialActivationContext(specialMatch.FirstPosition, SpecialActivationPhase.First));
-            contexts.Add(new SpecialActivationContext(specialMatch.SecondPosition, SpecialActivationPhase.First));
+            SpecialType primary = first.Special == SpecialType.ColorBomb || second.Special == SpecialType.ColorBomb
+                ? SpecialType.ColorBomb
+                : first.Special;
+            SpecialType partnerType = primary == first.Special ? second.Special : first.Special;
+            int? targetColor = primary == SpecialType.ColorBomb && partnerType != SpecialType.ColorBomb
+                ? (first.Special == SpecialType.ColorBomb ? second.Color : first.Color)
+                : null;
+            contexts.Add(new SpecialActivationContext(center, SpecialActivationPhase.First, targetColor,
+                special: primary, combinedWith: partnerType, partnerPosition: specialMatch.FirstPosition));
             return contexts;
         }
 
@@ -115,6 +115,11 @@ namespace Gazeus.DesafioMatch3.Core
                 if (queuedSpecials.Add(context.Position))
                 {
                     specialsToActivate.Enqueue(context);
+                }
+
+                if (context.PartnerPosition.HasValue)
+                {
+                    queuedSpecials.Add(context.PartnerPosition.Value);
                 }
             }
 
@@ -145,8 +150,7 @@ namespace Gazeus.DesafioMatch3.Core
                     continue;
                 }
 
-                SpecialType special = board[request.Position.x, request.Position.y].Special;
-                ISpecialEffect effect = FindEffect(special);
+                ISpecialEffect effect = FindEffect(request);
                 if (effect == null)
                 {
                     continue;
@@ -154,7 +158,9 @@ namespace Gazeus.DesafioMatch3.Core
 
                 activations.Add(new SpecialActivationInfo
                 {
-                    Special = special,
+                    Special = request.Special,
+                    CombinedWith = request.CombinedWith,
+                    PartnerPosition = request.PartnerPosition,
                     Position = request.Position,
                     Phase = request.Phase,
                     TargetColor = request.TargetColor
@@ -162,15 +168,24 @@ namespace Gazeus.DesafioMatch3.Core
 
                 SpecialActivationResult activation = effect.Activate(
                     board, request);
-                if (activation.PreserveSource)
+                for (int index = 0; index < activation.PreservedCells.Count; index++)
                 {
-                    preservedSourceCells.Add(request.Position);
-                    destructionCells.Remove(request.Position);
+                    Vector2Int preserved = activation.PreservedCells[index];
+                    preservedSourceCells.Add(preserved);
+                    destructionCells.Remove(preserved);
                 }
 
-                if (activation.PendingActivation != null)
+                pendingActivations.AddRange(activation.PendingActivations);
+                for (int index = 0; index < activation.Transformations.Count; index++)
                 {
-                    pendingActivations.Add(activation.PendingActivation);
+                    SpecialTransformation transformation = activation.Transformations[index];
+                    board[transformation.Position.x, transformation.Position.y].Special = transformation.Special;
+                }
+
+                for (int index = 0; index < activation.TriggeredActivations.Count; index++)
+                {
+                    SpecialActivationContext triggered = activation.TriggeredActivations[index];
+                    if (queuedSpecials.Add(triggered.Position)) specialsToActivate.Enqueue(triggered);
                 }
 
                 for (int index = 0; index < activation.AffectedCells.Count; index++)
@@ -183,11 +198,11 @@ namespace Gazeus.DesafioMatch3.Core
             return new SpecialEffectResolution(destructionCells, pendingActivations, activations);
         }
 
-        private static ISpecialEffect FindEffect(SpecialType special)
+        private static ISpecialEffect FindEffect(SpecialActivationContext context)
         {
             for (int index = 0; index < Effects.Length; index++)
             {
-                if (Effects[index].CanHandle(special))
+                if (Effects[index].CanHandle(context))
                 {
                     return Effects[index];
                 }
@@ -223,9 +238,9 @@ namespace Gazeus.DesafioMatch3.Core
             HashSet<Vector2Int> queuedSpecials)
         {
             SpecialType special = board[position.x, position.y].Special;
-            if (special != SpecialType.ColorBomb && FindEffect(special) != null && queuedSpecials.Add(position))
+            if (special != SpecialType.ColorBomb && queuedSpecials.Add(position))
             {
-                specialsToActivate.Enqueue(new SpecialActivationContext(position, phase));
+                specialsToActivate.Enqueue(new SpecialActivationContext(position, phase, special: special));
             }
         }
 

@@ -6,7 +6,8 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 {
     internal sealed class ColorBombEffect : ISpecialEffect
     {
-        public bool CanHandle(SpecialType special) => special == SpecialType.ColorBomb;
+        public bool CanHandle(SpecialActivationContext context) =>
+            !context.CombinedWith.HasValue && context.Special == SpecialType.ColorBomb;
 
         public SpecialActivationResult Activate(Board board, SpecialActivationContext context)
         {

@@ -6,9 +6,9 @@ using Gazeus.DesafioMatch3.Tests.EditMode.Fixtures;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace Gazeus.DesafioMatch3.Tests.EditMode
+namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
 {
-    public sealed class ColorBombTests
+    public sealed class SpecialEffectsTests
     {
         [TestCase(SpecialType.HorizontalStriped, SpecialType.VerticalStriped)]
         [TestCase(SpecialType.HorizontalStriped, SpecialType.Wrapped)]
@@ -148,19 +148,16 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
-        public void TrySwap_StripedAndWrapped_ActivatesBothAndCompletesWrappedSecondPhase()
+        public void TrySwap_StripedAndWrapped_UsesSingleCombinationActivation()
         {
             Board board = CreateSpecialPairBoard(SpecialType.HorizontalStriped, SpecialType.Wrapped);
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
             MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
 
-            Assert.That(result.BoardSequences[0].SpecialActivations.Any(info =>
-                info.Special == SpecialType.HorizontalStriped), Is.True);
-            Assert.That(result.BoardSequences[0].SpecialActivations.Any(info =>
-                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.First), Is.True);
-            Assert.That(result.BoardSequences.Skip(1).SelectMany(sequence => sequence.SpecialActivations).Any(info =>
-                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.Second), Is.True);
+            Assert.That(result.BoardSequences[0].SpecialActivations, Has.Count.EqualTo(1));
+            Assert.That(result.BoardSequences[0].SpecialActivations[0].CombinedWith,
+                Is.EqualTo(SpecialType.HorizontalStriped));
         }
 
         [Test]
@@ -172,7 +169,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
 
             Assert.That(result.BoardSequences[0].SpecialActivations.Count(info =>
-                info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.First), Is.EqualTo(2));
+                info.Special == SpecialType.Wrapped && info.CombinedWith == SpecialType.Wrapped &&
+                info.Phase == SpecialActivationPhase.First), Is.EqualTo(1));
             Assert.That(result.BoardSequences.Skip(1).SelectMany(sequence => sequence.SpecialActivations).Count(info =>
                 info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.Second), Is.EqualTo(2));
         }
@@ -189,7 +187,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             BoardSequence first = result.BoardSequences[0];
             Assert.That(first.MatchedPosition, Has.Count.EqualTo(board.Width * board.Height));
-            Assert.That(first.SpecialActivations.Count(info => info.Special == SpecialType.ColorBomb), Is.EqualTo(2));
+            Assert.That(first.SpecialActivations.Count(info => info.Special == SpecialType.ColorBomb), Is.EqualTo(1));
         }
 
         [TestCase(SpecialType.HorizontalStriped)]
@@ -204,7 +202,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             BoardSequence first = result.BoardSequences[0];
             Assert.That(first.SpecialActivations.Single(info => info.Special == SpecialType.ColorBomb).TargetColor,
                 Is.EqualTo(1));
-            Assert.That(first.SpecialActivations.Count(info => info.Special == special), Is.EqualTo(1));
+            Assert.That(first.SpecialActivations.Single(info => info.Special == SpecialType.ColorBomb).CombinedWith,
+                Is.EqualTo(special));
         }
 
         [Test]

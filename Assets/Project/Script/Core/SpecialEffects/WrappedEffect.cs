@@ -6,9 +6,9 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 {
     internal sealed class WrappedEffect : ISpecialEffect
     {
-        public bool CanHandle(SpecialType special)
+        public bool CanHandle(SpecialActivationContext context)
         {
-            return special == SpecialType.Wrapped;
+            return !context.CombinedWith.HasValue && context.Special == SpecialType.Wrapped;
         }
 
         public SpecialActivationResult Activate(
@@ -40,8 +40,10 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 
             return new SpecialActivationResult(
                 affectedCells,
-                isFirstActivation,
-                pendingActivation);
+                isFirstActivation ? new[] { position } : System.Array.Empty<Vector2Int>(),
+                pendingActivation == null ? System.Array.Empty<PendingSpecialActivation>() : new[] { pendingActivation },
+                System.Array.Empty<SpecialActivationContext>(),
+                System.Array.Empty<SpecialTransformation>());
         }
     }
 }

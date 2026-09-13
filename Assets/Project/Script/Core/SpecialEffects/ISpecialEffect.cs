@@ -5,7 +5,7 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 {
     internal interface ISpecialEffect
     {
-        bool CanHandle(SpecialType special);
+        bool CanHandle(SpecialActivationContext context);
 
         SpecialActivationResult Activate(
             Board board,

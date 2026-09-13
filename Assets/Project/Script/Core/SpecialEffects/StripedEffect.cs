@@ -6,10 +6,11 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
 {
     internal sealed class StripedEffect : ISpecialEffect
     {
-        public bool CanHandle(SpecialType special)
+        public bool CanHandle(SpecialActivationContext context)
         {
-            return special == SpecialType.HorizontalStriped ||
-                   special == SpecialType.VerticalStriped;
+            return !context.CombinedWith.HasValue &&
+                   (context.Special == SpecialType.HorizontalStriped ||
+                    context.Special == SpecialType.VerticalStriped);
         }
 
         public SpecialActivationResult Activate(
