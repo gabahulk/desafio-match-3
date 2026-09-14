@@ -206,6 +206,40 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
                 Is.EqualTo(special));
         }
 
+        [TestCase(SpecialType.ColorBomb, SpecialType.HorizontalStriped, 0)]
+        [TestCase(SpecialType.HorizontalStriped, SpecialType.ColorBomb, 1)]
+        [TestCase(SpecialType.ColorBomb, SpecialType.Wrapped, 0)]
+        [TestCase(SpecialType.Wrapped, SpecialType.ColorBomb, 1)]
+        public void TrySwap_ColorBombAndDirectSpecial_ActivatesAndConsumesPartner(
+            SpecialType first,
+            SpecialType second,
+            int partnerXAfterSwap)
+        {
+            Board board = CreateSpecialPairBoard(first, second);
+            Tile partner = first == SpecialType.ColorBomb ? board[1, 0] : board[0, 0];
+            partner.Color = 4;
+            int partnerId = partner.Id;
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
+
+            SpecialType partnerSpecial = first == SpecialType.ColorBomb ? second : first;
+            Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations).Count(info =>
+                info.Special == partnerSpecial && info.Phase == SpecialActivationPhase.First), Is.EqualTo(1));
+            Assert.That(result.BoardSequences[0].MatchedPosition,
+                Does.Contain(partnerSpecial == SpecialType.HorizontalStriped
+                    ? new Vector2Int(4, 0)
+                    : new Vector2Int(partnerXAfterSwap == 0 ? 1 : 0, 1)));
+            if (partnerSpecial == SpecialType.Wrapped)
+            {
+                Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations).Count(info =>
+                    info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.Second),
+                    Is.EqualTo(1));
+            }
+
+            Assert.That(ContainsTileId(service.Board, partnerId), Is.False);
+        }
+
         [Test]
         public void TrySwap_IndirectlyHitColorBomb_IsDestroyedWithoutColorBombActivation()
         {
@@ -252,6 +286,22 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
             {
                 Random.state = state;
             }
+        }
+
+        private static bool ContainsTileId(Board board, int tileId)
+        {
+            for (int y = 0; y < board.Height; y++)
+            {
+                for (int x = 0; x < board.Width; x++)
+                {
+                    if (board[x, y].Id == tileId)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

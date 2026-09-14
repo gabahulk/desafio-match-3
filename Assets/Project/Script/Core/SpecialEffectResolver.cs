@@ -98,8 +98,21 @@ namespace Gazeus.DesafioMatch3.Core
             int? targetColor = primary == SpecialType.ColorBomb && partnerType != SpecialType.ColorBomb
                 ? (first.Special == SpecialType.ColorBomb ? second.Color : first.Color)
                 : null;
-            contexts.Add(new SpecialActivationContext(center, SpecialActivationPhase.First, targetColor,
-                special: primary, combinedWith: partnerType, partnerPosition: specialMatch.FirstPosition));
+            Vector2Int activationPosition = center;
+            Vector2Int partnerPosition = specialMatch.FirstPosition;
+            if (primary == SpecialType.ColorBomb)
+            {
+                bool firstIsBomb = first.Special == SpecialType.ColorBomb;
+                activationPosition = firstIsBomb
+                    ? specialMatch.FirstPosition
+                    : specialMatch.SecondPosition;
+                partnerPosition = firstIsBomb
+                    ? specialMatch.SecondPosition
+                    : specialMatch.FirstPosition;
+            }
+
+            contexts.Add(new SpecialActivationContext(activationPosition, SpecialActivationPhase.First, targetColor,
+                special: primary, combinedWith: partnerType, partnerPosition: partnerPosition));
             return contexts;
         }
 
@@ -117,7 +130,11 @@ namespace Gazeus.DesafioMatch3.Core
                     specialsToActivate.Enqueue(context);
                 }
 
-                if (context.PartnerPosition.HasValue)
+                bool partnerTransformsAndActivates =
+                    context.Special == SpecialType.ColorBomb &&
+                    context.CombinedWith.HasValue &&
+                    context.CombinedWith != SpecialType.ColorBomb;
+                if (context.PartnerPosition.HasValue && !partnerTransformsAndActivates)
                 {
                     queuedSpecials.Add(context.PartnerPosition.Value);
                 }
