@@ -37,7 +37,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 boardViewData.FindProperty("_tileSpotPrefab").objectReferenceValue = tileSpot;
                 boardViewData.ApplyModifiedPropertiesWithoutUndo();
 
-                Board board = new(3, 1);
+                Board board = new(4, 1);
                 board[0, 0] = new Tile
                 {
                     Id = 0,
@@ -48,7 +48,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 {
                     Id = 1,
                     Color = 0,
-                    Special = SpecialType.None
+                    Special = SpecialType.Wrapped
                 };
                 board[2, 0] = new Tile
                 {
@@ -56,10 +56,19 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                     Color = -1,
                     Special = SpecialType.ColorBomb
                 };
+                board[3, 0] = new Tile
+                {
+                    Id = 3,
+                    Color = 0,
+                    Special = SpecialType.None
+                };
 
                 boardView.CreateBoard(board);
                 Assert.That(
                     FindDescendant(root.transform, "HorizontalStriped Overlay"),
+                    Is.Not.Null);
+                Assert.That(
+                    FindDescendant(root.transform, "Wrapped Overlay"),
                     Is.Not.Null);
                 Assert.That(
                     FindDescendant(root.transform, "ColorBomb Overlay"),
@@ -69,7 +78,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 {
                     new()
                     {
-                        Position = new Vector2Int(1, 0),
+                        Position = new Vector2Int(3, 0),
                         Color = 0,
                         Special = SpecialType.VerticalStriped
                     }

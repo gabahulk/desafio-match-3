@@ -19,11 +19,7 @@ namespace Gazeus.DesafioMatch3.Core
 
         public GameService(Board board, IReadOnlyList<int> colors)
         {
-            _board = board ?? throw new ArgumentNullException(nameof(board));
-            _colors = colors != null
-                ? new List<int>(colors)
-                : throw new ArgumentNullException(nameof(colors));
-            _tileCount = GetNextTileId(board);
+            StartGame(board, colors);
         }
 
         public Board StartGame(int boardWidth, int boardHeight)
@@ -31,6 +27,17 @@ namespace Gazeus.DesafioMatch3.Core
             _colors = new List<int> { 0, 1, 2, 3 };
             _board = BoardGenerator.Create(boardWidth, boardHeight, _colors);
             _tileCount = boardWidth * boardHeight;
+
+            return _board;
+        }
+
+        public Board StartGame(Board board, IReadOnlyList<int> colors)
+        {
+            _board = board ?? throw new ArgumentNullException(nameof(board));
+            _colors = colors != null
+                ? new List<int>(colors)
+                : throw new ArgumentNullException(nameof(colors));
+            _tileCount = GetNextTileId(board);
 
             return _board;
         }
@@ -198,6 +205,7 @@ namespace Gazeus.DesafioMatch3.Core
                             addedTiles.Add(new AddedTileInfo
                             {
                                 Position = new Vector2Int(x, y),
+                                Id = tile.Id,
                                 Color = tile.Color
                             });
                         }

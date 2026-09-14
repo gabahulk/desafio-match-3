@@ -16,13 +16,14 @@ namespace Gazeus.DesafioMatch3.Controllers
 
         private GameService _gameService;
         private bool _isAnimating;
+        private bool _hasStarted;
         private int _selectedX = -1;
         private int _selectedY = -1;
 
         #region Unity
         private void Awake()
         {
-            _gameService = new GameService();
+            _gameService ??= new GameService();
             _boardView.TileClicked += OnTileClick;
         }
 
@@ -33,10 +34,31 @@ namespace Gazeus.DesafioMatch3.Controllers
 
         private void Start()
         {
-            Board board = _gameService.StartGame(_boardWidth, _boardHeight);
-            _boardView.CreateBoard(board);
+            if (_hasStarted)
+            {
+                return;
+            }
+
+            CreateBoard(_gameService.StartGame(_boardWidth, _boardHeight));
         }
         #endregion
+
+        public void StartGame(Board board, IReadOnlyList<int> colors)
+        {
+            if (_hasStarted)
+            {
+                throw new InvalidOperationException("The game has already started.");
+            }
+
+            _gameService ??= new GameService();
+            CreateBoard(_gameService.StartGame(board, colors));
+        }
+
+        private void CreateBoard(Board board)
+        {
+            _hasStarted = true;
+            _boardView.CreateBoard(board);
+        }
 
         private void AnimateBoard(IReadOnlyList<BoardSequence> boardSequences, int index, Action onComplete)
         {
