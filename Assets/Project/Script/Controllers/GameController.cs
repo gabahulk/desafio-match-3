@@ -20,6 +20,9 @@ namespace Gazeus.DesafioMatch3.Controllers
         private int _selectedX = -1;
         private int _selectedY = -1;
 
+        public Board Board => _gameService?.Board;
+        public bool IsAnimating => _isAnimating;
+
         #region Unity
         private void Awake()
         {

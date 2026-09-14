@@ -1,0 +1,19 @@
+{
+    "name": "DesafioMatch3.Tests.PlayMode",
+    "rootNamespace": "Gazeus.DesafioMatch3.Tests.PlayMode",
+    "references": [
+        "DesafioMatch3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

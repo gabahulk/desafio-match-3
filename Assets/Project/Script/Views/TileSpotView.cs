@@ -14,6 +14,8 @@ namespace Gazeus.DesafioMatch3.Views
         private int _x;
         private int _y;
 
+        public Vector2Int Position => new(_x, _y);
+
         #region Unity
         private void Awake()
         {

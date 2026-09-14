@@ -13,6 +13,8 @@ namespace Gazeus.DesafioMatch3.Core
         private List<int> _colors;
         private int _tileCount;
 
+        public Board Board => _board;
+
         public GameService()
         {
         }
