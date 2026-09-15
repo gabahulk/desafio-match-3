@@ -156,6 +156,7 @@ namespace Gazeus.DesafioMatch3.Core
             List<SpecialActivationInfo> activations = initialActivations != null
                 ? new List<SpecialActivationInfo>(initialActivations)
                 : new List<SpecialActivationInfo>();
+            List<SpecialTransformation> transformations = new();
             HashSet<Vector2Int> preservedSourceCells = new();
             HashSet<Vector2Int> activatedSpecials = new();
 
@@ -196,6 +197,7 @@ namespace Gazeus.DesafioMatch3.Core
                 {
                     SpecialTransformation transformation = activation.Transformations[index];
                     board[transformation.Position.x, transformation.Position.y].Special = transformation.Special;
+                    transformations.Add(transformation);
                 }
 
                 for (int index = 0; index < activation.TriggeredActivations.Count; index++)
@@ -211,7 +213,11 @@ namespace Gazeus.DesafioMatch3.Core
                 }
             }
 
-            return new SpecialEffectResolution(destructionCells, pendingActivations, activations);
+            return new SpecialEffectResolution(
+                destructionCells,
+                pendingActivations,
+                activations,
+                transformations);
         }
 
         private static ISpecialEffect FindEffect(SpecialActivationContext context)

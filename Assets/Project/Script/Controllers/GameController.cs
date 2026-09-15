@@ -108,6 +108,7 @@ namespace Gazeus.DesafioMatch3.Controllers
             BoardSequence boardSequence = boardSequences[index];
 
             Sequence sequence = DOTween.Sequence();
+            _boardView.ApplySpecialTransformations(boardSequence.TransformedSpecialTiles);
             sequence.Append(_boardView.PlaySpecialActivations(boardSequence.SpecialActivations));
             sequence.Append(_boardView.DestroyTiles(boardSequence.MatchedPosition));
             _boardView.ApplyCreatedSpecials(boardSequence.CreatedSpecialTiles);
@@ -135,7 +136,7 @@ namespace Gazeus.DesafioMatch3.Controllers
 
             if (_selectedX > -1 && _selectedY > -1)
             {
-                if (Mathf.Abs(_selectedX - x) + Mathf.Abs(_selectedY - y) > 1)
+                if (Mathf.Abs(_selectedX - x) + Mathf.Abs(_selectedY - y) != 1)
                 {
                     _selectedX = -1;
                     _selectedY = -1;

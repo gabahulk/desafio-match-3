@@ -9,6 +9,7 @@ namespace Gazeus.DesafioMatch3.Models
         public List<AddedTileInfo> AddedTiles { get; set; }
         public List<Vector2Int> MatchedPosition { get; set; }
         public List<SpecialTileInfo> CreatedSpecialTiles { get; set; }
+        public List<SpecialTileInfo> TransformedSpecialTiles { get; set; }
         public List<SpecialActivationInfo> SpecialActivations { get; set; }
         public int ScoreGained { get; set; }
         public int TotalScore { get; set; }

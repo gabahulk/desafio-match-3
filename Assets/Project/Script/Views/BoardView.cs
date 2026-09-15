@@ -77,9 +77,19 @@ namespace Gazeus.DesafioMatch3.Views
 
         public void ApplyCreatedSpecials(List<SpecialTileInfo> createdSpecialTiles)
         {
-            for (int index = 0; index < createdSpecialTiles.Count; index++)
+            ApplySpecialVisuals(createdSpecialTiles);
+        }
+
+        public void ApplySpecialTransformations(List<SpecialTileInfo> transformedSpecialTiles)
+        {
+            ApplySpecialVisuals(transformedSpecialTiles);
+        }
+
+        private void ApplySpecialVisuals(IReadOnlyList<SpecialTileInfo> specialTiles)
+        {
+            for (int index = 0; index < specialTiles.Count; index++)
             {
-                SpecialTileInfo specialTile = createdSpecialTiles[index];
+                SpecialTileInfo specialTile = specialTiles[index];
                 GameObject tile = _tiles[specialTile.Position.y][specialTile.Position.x];
                 ApplySpecialVisual(tile, specialTile.Special);
             }
@@ -161,12 +171,18 @@ namespace Gazeus.DesafioMatch3.Views
 
         private static void ApplySpecialVisual(GameObject tile, SpecialType special)
         {
-            if (tile == null || special == SpecialType.None)
+            if (tile == null)
             {
                 return;
             }
 
             string overlayName = $"{special} Overlay";
+            RemoveOtherSpecialVisuals(tile, overlayName);
+            if (special == SpecialType.None)
+            {
+                return;
+            }
+
             if (tile.transform.Find(overlayName) != null)
             {
                 return;
@@ -211,6 +227,42 @@ namespace Gazeus.DesafioMatch3.Views
             Image stripe = overlay.GetComponent<Image>();
             stripe.color = new Color(1.0f, 1.0f, 1.0f, 0.85f);
             stripe.raycastTarget = false;
+        }
+
+        private static void RemoveOtherSpecialVisuals(GameObject tile, string retainedOverlayName)
+        {
+            SpecialType[] visualTypes =
+            {
+                SpecialType.HorizontalStriped,
+                SpecialType.VerticalStriped,
+                SpecialType.Wrapped,
+                SpecialType.ColorBomb
+            };
+
+            for (int index = 0; index < visualTypes.Length; index++)
+            {
+                string overlayName = $"{visualTypes[index]} Overlay";
+                if (overlayName == retainedOverlayName)
+                {
+                    continue;
+                }
+
+                Transform overlay = tile.transform.Find(overlayName);
+                if (overlay == null)
+                {
+                    continue;
+                }
+
+                overlay.gameObject.SetActive(false);
+                if (Application.isPlaying)
+                {
+                    Destroy(overlay.gameObject);
+                }
+                else
+                {
+                    DestroyImmediate(overlay.gameObject);
+                }
+            }
         }
 
         private GameObject GetTilePrefab(Tile tile)

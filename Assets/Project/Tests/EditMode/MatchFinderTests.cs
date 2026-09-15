@@ -158,6 +158,25 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
         }
 
         [Test]
+        public void FindMatches_WithThreeAlignedColorBombs_DoesNotMatchColorlessTiles()
+        {
+            Board board = new(3, 1);
+            for (int x = 0; x < board.Width; x++)
+            {
+                board[x, 0] = new Tile
+                {
+                    Id = x,
+                    Color = -1,
+                    Special = SpecialType.ColorBomb
+                };
+            }
+
+            IReadOnlyList<MatchPattern> patterns = MatchFinder.FindMatches(board);
+
+            Assert.That(patterns, Is.Empty);
+        }
+
+        [Test]
         public void FindMatches_WithEndpointIntersectionOnBothRuns_ReturnsLWithUniqueCells()
         {
             IReadOnlyList<MatchPattern> patterns = FindPatterns(

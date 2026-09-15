@@ -49,6 +49,11 @@ namespace Gazeus.DesafioMatch3.Core
 
         public MoveResult TrySwap(int fromX, int fromY, int toX, int toY)
         {
+            if (Math.Abs(fromX - toX) + Math.Abs(fromY - toY) != 1)
+            {
+                return new MoveResult(false, Array.Empty<BoardSequence>());
+            }
+
             Board candidateBoard = _board.Clone();
 
             (candidateBoard[toX, toY], candidateBoard[fromX, fromY]) =
@@ -142,6 +147,18 @@ namespace Gazeus.DesafioMatch3.Core
                 int scoreGained = destructionCells.Count * 10 * cascadeMultiplier;
                 Score += scoreGained;
 
+                List<SpecialTileInfo> transformedSpecialTiles = new(effectResolution.Transformations.Count);
+                for (int index = 0; index < effectResolution.Transformations.Count; index++)
+                {
+                    SpecialTransformation transformation = effectResolution.Transformations[index];
+                    transformedSpecialTiles.Add(new SpecialTileInfo
+                    {
+                        Position = transformation.Position,
+                        Color = board[transformation.Position.x, transformation.Position.y].Color,
+                        Special = transformation.Special
+                    });
+                }
+
                 List<Vector2Int> matchedPosition = new(destructionCells.Count);
                 for (int y = 0; y < board.Height; y++)
                 {
@@ -231,6 +248,7 @@ namespace Gazeus.DesafioMatch3.Core
                     MovedTiles = movedTilesList,
                     AddedTiles = addedTiles,
                     CreatedSpecialTiles = createdSpecialTiles,
+                    TransformedSpecialTiles = transformedSpecialTiles,
                     SpecialActivations = new List<SpecialActivationInfo>(effectResolution.Activations),
                     ScoreGained = scoreGained,
                     TotalScore = Score

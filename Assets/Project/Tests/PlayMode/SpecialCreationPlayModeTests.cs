@@ -125,6 +125,60 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator SameCellClick_CancelsSelectionWithoutStartingSwapAnimation()
+        {
+            Random.State originalRandomState = Random.state;
+            try
+            {
+                Random.InitState(48271);
+                Board board = CreateBoard(
+                    "RGBY",
+                    "GBYR",
+                    "BYRG",
+                    "RRGR");
+                GameController controller = null;
+                UnityAction<Scene, LoadSceneMode> startExplicitBoard = (scene, _) =>
+                {
+                    controller = FindController(scene);
+                    controller?.StartGame(board, AvailableColors);
+                };
+
+                SceneManager.sceneLoaded += startExplicitBoard;
+                try
+                {
+                    SceneManager.LoadScene("Gameplay", LoadSceneMode.Single);
+                    float loadDeadline = Time.realtimeSinceStartup + 5.0f;
+                    while (controller == null && Time.realtimeSinceStartup < loadDeadline)
+                    {
+                        yield return null;
+                    }
+                }
+                finally
+                {
+                    SceneManager.sceneLoaded -= startExplicitBoard;
+                }
+
+                Assert.That(controller, Is.Not.Null);
+                yield return null;
+
+                Vector2Int position = new(1, 1);
+                int tileId = controller.Board[position.x, position.y].Id;
+                ClickTile(position);
+                ClickTile(position);
+
+                Assert.That(controller.IsAnimating, Is.False);
+                Assert.That(controller.Score, Is.Zero);
+                Assert.That(controller.Board[position.x, position.y].Id, Is.EqualTo(tileId));
+                yield return null;
+                Assert.That(controller.IsAnimating, Is.False);
+            }
+            finally
+            {
+                Random.state = originalRandomState;
+            }
+        }
+
+        [UnityTest]
         public IEnumerator CombineStripedAndStriped_ThroughPlayerSwap_ClearsOneRowAndColumn()
         {
             Board board = CreateCombinationBoard(

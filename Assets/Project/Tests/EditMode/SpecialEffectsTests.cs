@@ -206,6 +206,24 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
                 Is.EqualTo(special));
         }
 
+        [Test]
+        public void TrySwap_ColorBombAndWrapped_ReportsWrappedTransformationsInBoardSequence()
+        {
+            Board board = CreateSpecialPairBoard(SpecialType.ColorBomb, SpecialType.Wrapped);
+            board[1, 0].Color = 4;
+            board[2, 2].Color = 4;
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
+
+            BoardSequence first = result.BoardSequences[0];
+            Assert.That(first.TransformedSpecialTiles, Is.Not.Empty);
+            Assert.That(first.TransformedSpecialTiles.All(tile =>
+                tile.Special == SpecialType.Wrapped && tile.Color == 4), Is.True);
+            Assert.That(first.TransformedSpecialTiles.Any(tile =>
+                tile.Position == new Vector2Int(2, 2)), Is.True);
+        }
+
         [TestCase(SpecialType.ColorBomb, SpecialType.HorizontalStriped, 0)]
         [TestCase(SpecialType.HorizontalStriped, SpecialType.ColorBomb, 1)]
         [TestCase(SpecialType.ColorBomb, SpecialType.Wrapped, 0)]

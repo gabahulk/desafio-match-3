@@ -35,7 +35,7 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
                 }
             }
 
-            return new SpecialActivationResult(affectedCells, false, null);
+            return new SpecialActivationResult(affectedCells);
         }
     }
 }

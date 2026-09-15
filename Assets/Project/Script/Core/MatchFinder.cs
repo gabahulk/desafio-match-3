@@ -46,7 +46,7 @@ namespace Gazeus.DesafioMatch3.Core
                 int x = 0;
                 while (x < board.Width)
                 {
-                    if (board[x, y].IsEmpty)
+                    if (board[x, y].IsEmpty || board[x, y].Color < 0)
                     {
                         x++;
                         continue;
@@ -82,7 +82,7 @@ namespace Gazeus.DesafioMatch3.Core
                 int y = 0;
                 while (y < board.Height)
                 {
-                    if (board[x, y].IsEmpty)
+                    if (board[x, y].IsEmpty || board[x, y].Color < 0)
                     {
                         y++;
                         continue;

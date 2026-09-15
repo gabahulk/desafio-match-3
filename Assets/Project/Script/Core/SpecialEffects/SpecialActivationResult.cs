@@ -12,15 +12,14 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
         internal IReadOnlyList<SpecialTransformation> Transformations { get; }
 
         internal SpecialActivationResult(
-            IReadOnlyList<Vector2Int> affectedCells,
-            bool preserveSource,
-            PendingSpecialActivation pendingActivation)
+            IReadOnlyList<Vector2Int> affectedCells)
+            : this(
+                affectedCells,
+                System.Array.Empty<Vector2Int>(),
+                System.Array.Empty<PendingSpecialActivation>(),
+                System.Array.Empty<SpecialActivationContext>(),
+                System.Array.Empty<SpecialTransformation>())
         {
-            AffectedCells = affectedCells;
-            PreservedCells = preserveSource ? new[] { Vector2Int.zero } : System.Array.Empty<Vector2Int>();
-            PendingActivations = pendingActivation == null ? System.Array.Empty<PendingSpecialActivation>() : new[] { pendingActivation };
-            TriggeredActivations = System.Array.Empty<SpecialActivationContext>();
-            Transformations = System.Array.Empty<SpecialTransformation>();
         }
 
         internal SpecialActivationResult(IReadOnlyList<Vector2Int> affectedCells,

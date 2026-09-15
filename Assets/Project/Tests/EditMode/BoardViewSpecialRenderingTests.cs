@@ -87,6 +87,28 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 Assert.That(
                     FindDescendant(root.transform, "VerticalStriped Overlay"),
                     Is.Not.Null);
+
+                Transform horizontalOverlay = FindDescendant(
+                    root.transform,
+                    "HorizontalStriped Overlay");
+                GameObject transformedTile = horizontalOverlay.parent.gameObject;
+                boardView.ApplySpecialTransformations(new List<SpecialTileInfo>
+                {
+                    new()
+                    {
+                        Position = new Vector2Int(0, 0),
+                        Color = 0,
+                        Special = SpecialType.Wrapped
+                    }
+                });
+
+                Assert.That(
+                    transformedTile.transform.Find("Wrapped Overlay"),
+                    Is.Not.Null);
+                Assert.That(
+                    transformedTile.transform.Find("HorizontalStriped Overlay"),
+                    Is.Null,
+                    "A transformation must remove the previous special overlay.");
             }
             finally
             {
