@@ -97,6 +97,34 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator Score_PlayerMatch_VisibleTotalMatchesGameService()
+        {
+            Board board = CreateBoard(
+                "RGBY",
+                "GBYR",
+                "BYRG",
+                "RRGR");
+
+            yield return RunGameplay(
+                board,
+                new Vector2Int(2, 3),
+                new Vector2Int(3, 3),
+                controller =>
+                {
+                    Text scoreText = FindScoreText();
+                    Assert.That(controller.Score, Is.Zero);
+                    Assert.That(scoreText.text, Is.EqualTo("SCORE\n0"));
+                    Assert.That(scoreText.gameObject.activeInHierarchy, Is.True);
+                },
+                controller =>
+                {
+                    Text scoreText = FindScoreText();
+                    Assert.That(controller.Score, Is.GreaterThan(0));
+                    Assert.That(scoreText.text, Is.EqualTo($"SCORE\n{controller.Score}"));
+                });
+        }
+
+        [UnityTest]
         public IEnumerator CombineStripedAndStriped_ThroughPlayerSwap_ClearsOneRowAndColumn()
         {
             Board board = CreateCombinationBoard(
@@ -477,6 +505,15 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
 
             Assert.Fail($"No rendered tile spot was found at {position}.");
             return null;
+        }
+
+        private static Text FindScoreText()
+        {
+            GameObject scoreObject = GameObject.Find("Score");
+            Assert.That(scoreObject, Is.Not.Null, "The score display was not found in the Gameplay UI.");
+            Text scoreText = scoreObject.GetComponent<Text>();
+            Assert.That(scoreText, Is.Not.Null);
+            return scoreText;
         }
 
         private static Transform FindDescendant(Transform parent, string name)

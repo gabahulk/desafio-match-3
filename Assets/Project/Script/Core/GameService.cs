@@ -14,6 +14,7 @@ namespace Gazeus.DesafioMatch3.Core
         private int _tileCount;
 
         public Board Board => _board;
+        public int Score { get; private set; }
 
         public GameService()
         {
@@ -26,6 +27,7 @@ namespace Gazeus.DesafioMatch3.Core
 
         public Board StartGame(int boardWidth, int boardHeight)
         {
+            Score = 0;
             _colors = new List<int> { 0, 1, 2, 3 };
             _board = BoardGenerator.Create(boardWidth, boardHeight, _colors);
             _tileCount = boardWidth * boardHeight;
@@ -35,6 +37,7 @@ namespace Gazeus.DesafioMatch3.Core
 
         public Board StartGame(Board board, IReadOnlyList<int> colors)
         {
+            Score = 0;
             _board = board ?? throw new ArgumentNullException(nameof(board));
             _colors = colors != null
                 ? new List<int>(colors)
@@ -79,6 +82,7 @@ namespace Gazeus.DesafioMatch3.Core
             List<BoardSequence> boardSequences = new();
             IReadOnlyList<PendingSpecialActivation> pendingActivations =
                 Array.Empty<PendingSpecialActivation>();
+            int cascadeMultiplier = 1;
 
             while (patterns.Count > 0 || pendingActivations.Count > 0 || initialActivations != null)
             {
@@ -128,8 +132,15 @@ namespace Gazeus.DesafioMatch3.Core
                 if (destructionCells.Count == 0)
                 {
                     patterns = MatchFinder.FindMatches(board);
+                    if (patterns.Count > 0)
+                    {
+                        cascadeMultiplier++;
+                    }
                     continue;
                 }
+
+                int scoreGained = destructionCells.Count * 10 * cascadeMultiplier;
+                Score += scoreGained;
 
                 List<Vector2Int> matchedPosition = new(destructionCells.Count);
                 for (int y = 0; y < board.Height; y++)
@@ -220,13 +231,24 @@ namespace Gazeus.DesafioMatch3.Core
                     MovedTiles = movedTilesList,
                     AddedTiles = addedTiles,
                     CreatedSpecialTiles = createdSpecialTiles,
-                    SpecialActivations = new List<SpecialActivationInfo>(effectResolution.Activations)
+                    SpecialActivations = new List<SpecialActivationInfo>(effectResolution.Activations),
+                    ScoreGained = scoreGained,
+                    TotalScore = Score
                 };
                 boardSequences.Add(sequence);
                 context = SpecialSpawnContext.FromCascade(movedTilesList, addedTiles);
-                patterns = pendingActivations.Count > 0
-                    ? Array.Empty<MatchPattern>()
-                    : MatchFinder.FindMatches(board);
+                if (pendingActivations.Count > 0)
+                {
+                    patterns = Array.Empty<MatchPattern>();
+                }
+                else
+                {
+                    patterns = MatchFinder.FindMatches(board);
+                    if (patterns.Count > 0)
+                    {
+                        cascadeMultiplier++;
+                    }
+                }
             }
 
             return boardSequences;
