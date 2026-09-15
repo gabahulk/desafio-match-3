@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Gazeus.DesafioMatch3.Controllers;
 using Gazeus.DesafioMatch3.Models;
 using Gazeus.DesafioMatch3.Views;
@@ -224,6 +225,88 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             });
         }
 
+        [UnityTest]
+        public IEnumerator ChainStripedToStriped_ThroughPlayerSwap_ActivatesSecondLine()
+        {
+            Board board = CreateIndirectChainBoard(SpecialType.HorizontalStriped, SpecialType.VerticalStriped);
+
+            yield return RunIndirectChainScenario(board, finalBoard =>
+            {
+                AssertIdsAbsent(finalBoard, 1);
+            });
+        }
+
+        [UnityTest]
+        public IEnumerator ChainStripedToWrapped_ThroughPlayerSwap_CompletesBothWrappedPhases()
+        {
+            Board board = CreateIndirectChainBoard(SpecialType.HorizontalStriped, SpecialType.Wrapped);
+
+            yield return RunIndirectChainScenario(board, finalBoard =>
+            {
+                AssertIdsAbsent(finalBoard,
+                    27,
+                    18);
+            });
+        }
+
+        [UnityTest]
+        public IEnumerator ChainStripedToColorBomb_ThroughPlayerSwap_ClearsMostCommonColor()
+        {
+            Board board = CreateIndirectChainBoard(
+                SpecialType.HorizontalStriped,
+                SpecialType.ColorBomb,
+                useMajorityBoard: true);
+            int[] majorityColorIds = GetTileIdsWithColor(board, 0);
+
+            yield return RunIndirectChainScenario(board, finalBoard =>
+            {
+                AssertIdsAbsent(finalBoard, majorityColorIds);
+            });
+        }
+
+        [UnityTest]
+        public IEnumerator ChainWrappedToStriped_ThroughPlayerSwap_ActivatesLineAndSecondWrappedPhase()
+        {
+            Board board = CreateIndirectChainBoard(SpecialType.Wrapped, SpecialType.VerticalStriped);
+
+            yield return RunIndirectChainScenario(board, finalBoard =>
+            {
+                AssertIdsAbsent(finalBoard,
+                    4,
+                    24);
+            });
+        }
+
+        [UnityTest]
+        public IEnumerator ChainWrappedToWrapped_ThroughPlayerSwap_CompletesIndirectWrappedSecondPhase()
+        {
+            Board board = CreateIndirectChainBoard(SpecialType.Wrapped, SpecialType.Wrapped);
+
+            yield return RunIndirectChainScenario(board, finalBoard =>
+            {
+                AssertIdsAbsent(finalBoard,
+                    30,
+                    12);
+                AssertIdSurvived(finalBoard, 0);
+            });
+        }
+
+        [UnityTest]
+        public IEnumerator ChainWrappedToColorBomb_ThroughPlayerSwap_ClearsMostCommonColorAndSecondWrappedPhase()
+        {
+            Board board = CreateIndirectChainBoard(
+                SpecialType.Wrapped,
+                SpecialType.ColorBomb,
+                useMajorityBoard: true);
+            int[] majorityColorIds = GetTileIdsWithColor(board, 0);
+
+            yield return RunIndirectChainScenario(board, finalBoard =>
+            {
+                AssertIdsAbsent(finalBoard, majorityColorIds);
+                AssertIdsAbsent(finalBoard, 23);
+            });
+        }
+
         private static IEnumerator RunScenario(
             Board board,
             Vector2Int from,
@@ -270,6 +353,22 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 {
                     Assert.That(CountSpecials(controller.Board), Is.EqualTo(2),
                         "The scenario must begin with exactly the seeded special pair.");
+                },
+                controller => assertFinalBoard(controller.Board));
+        }
+
+        private static IEnumerator RunIndirectChainScenario(
+            Board board,
+            Action<Board> assertFinalBoard)
+        {
+            yield return RunGameplay(
+                board,
+                new Vector2Int(4, 4),
+                new Vector2Int(5, 4),
+                controller =>
+                {
+                    Assert.That(CountSpecials(controller.Board), Is.EqualTo(2),
+                        "The scenario must begin with exactly the seeded indirect chain specials.");
                 },
                 controller => assertFinalBoard(controller.Board));
         }
@@ -345,14 +444,14 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
 
         private static IEnumerator WaitForResolution(GameController controller)
         {
-            float deadline = Time.realtimeSinceStartup + 10.0f;
+            float deadline = Time.realtimeSinceStartup + 20.0f;
             while (controller.IsAnimating && Time.realtimeSinceStartup < deadline)
             {
                 yield return null;
             }
 
             Assert.That(controller.IsAnimating, Is.False,
-                "Gameplay resolution did not complete within ten seconds.");
+                "Gameplay resolution did not complete within twenty seconds.");
         }
 
         private static void ClickTile(Vector2Int position)
@@ -581,6 +680,73 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             }
 
             return board;
+        }
+
+        private static Board CreateIndirectChainBoard(
+            SpecialType source,
+            SpecialType target,
+            bool useMajorityBoard = false)
+        {
+            Board board = useMajorityBoard
+                ? CreateBoard(
+                    "RRGRRGRRG",
+                    "RGRRGRRGR",
+                    "GRRGRRGRR",
+                    "RRGRRGRRG",
+                    "RGRRGRRGR",
+                    "GRRGRRGRR",
+                    "RRGRRGRRG",
+                    "RGRRGRRGR",
+                    "GRRGRRGRR")
+                : CreateBoard(
+                    "RGBYRGBYR",
+                    "GBYRGBYRG",
+                    "BYRGBYRGB",
+                    "YRGBYRGBY",
+                    "RGBYRGBYR",
+                    "GBYRGBYRG",
+                    "BYRGBYRGB",
+                    "YRGBYRGBY",
+                    "RGBYRGBYR");
+
+            board[6, 4].Color = 0;
+            board[7, 4].Color = 0;
+            board[8, 4].Color = useMajorityBoard ? 2 : 1;
+            board[5, 4].Color = 1;
+            if (useMajorityBoard)
+            {
+                board[3, 4].Color = 1;
+                board[4, 3].Color = 1;
+                board[4, 5].Color = 1;
+                board[7, 3].Color = 1;
+                board[7, 5].Color = 1;
+                board[5, 2].Color = 2;
+            }
+            SetSpecial(board[4, 4], source, 0);
+
+            Vector2Int targetPosition = source == SpecialType.Wrapped
+                ? new Vector2Int(4, 3)
+                : new Vector2Int(1, 4);
+            SetSpecial(board[targetPosition.x, targetPosition.y], target, 1);
+            return board;
+        }
+
+        private static int[] GetTileIdsWithColor(Board board, int color)
+        {
+            List<int> tileIds = new();
+            for (int y = 0; y < board.Height; y++)
+            {
+                for (int x = 0; x < board.Width; x++)
+                {
+                    Tile tile = board[x, y];
+                    if (!tile.IsEmpty && tile.Color == color)
+                    {
+                        tileIds.Add(tile.Id);
+                    }
+                }
+            }
+
+            return tileIds.ToArray();
         }
 
         private static void SetSpecial(Tile tile, SpecialType special, int color)

@@ -10,7 +10,7 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
         internal SpecialType? CombinedWith { get; }
         internal Vector2Int? PartnerPosition { get; }
         internal SpecialActivationPhase Phase { get; }
-        internal int? TargetColor { get; }
+        internal int? TargetColor { get; set; }
 
         internal SpecialActivationContext(
             Vector2Int position,

@@ -173,6 +173,8 @@ namespace Gazeus.DesafioMatch3.Core
                     continue;
                 }
 
+                SpecialActivationResult activation = effect.Activate(
+                    board, request);
                 activations.Add(new SpecialActivationInfo
                 {
                     Special = request.Special,
@@ -182,9 +184,6 @@ namespace Gazeus.DesafioMatch3.Core
                     Phase = request.Phase,
                     TargetColor = request.TargetColor
                 });
-
-                SpecialActivationResult activation = effect.Activate(
-                    board, request);
                 for (int index = 0; index < activation.PreservedCells.Count; index++)
                 {
                     Vector2Int preserved = activation.PreservedCells[index];
@@ -255,9 +254,10 @@ namespace Gazeus.DesafioMatch3.Core
             HashSet<Vector2Int> queuedSpecials)
         {
             SpecialType special = board[position.x, position.y].Special;
-            if (special != SpecialType.ColorBomb && queuedSpecials.Add(position))
+            SpecialActivationContext context = new(position, phase, special: special);
+            if (FindEffect(context) != null && queuedSpecials.Add(position))
             {
-                specialsToActivate.Enqueue(new SpecialActivationContext(position, phase, special: special));
+                specialsToActivate.Enqueue(context);
             }
         }
 

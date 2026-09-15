@@ -176,7 +176,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
         }
 
         [Test]
-        public void TrySwap_TwoColorBombs_ClearBoardWithoutActivatingIndirectBomb()
+        public void TrySwap_TwoColorBombs_ClearBoardAndActivateIndirectBomb()
         {
             Board board = CreateSpecialPairBoard(SpecialType.ColorBomb, SpecialType.ColorBomb);
             board[2, 0].Special = SpecialType.ColorBomb;
@@ -187,7 +187,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
 
             BoardSequence first = result.BoardSequences[0];
             Assert.That(first.MatchedPosition, Has.Count.EqualTo(board.Width * board.Height));
-            Assert.That(first.SpecialActivations.Count(info => info.Special == SpecialType.ColorBomb), Is.EqualTo(1));
+            Assert.That(first.SpecialActivations.Count(info => info.Special == SpecialType.ColorBomb), Is.EqualTo(2));
         }
 
         [TestCase(SpecialType.HorizontalStriped)]
@@ -240,20 +240,83 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
             Assert.That(ContainsTileId(service.Board, partnerId), Is.False);
         }
 
-        [Test]
-        public void TrySwap_IndirectlyHitColorBomb_IsDestroyedWithoutColorBombActivation()
+        [TestCase(SpecialType.HorizontalStriped, SpecialType.VerticalStriped, 1)]
+        [TestCase(SpecialType.HorizontalStriped, SpecialType.Wrapped, 18)]
+        [TestCase(SpecialType.HorizontalStriped, SpecialType.ColorBomb, 0)]
+        [TestCase(SpecialType.Wrapped, SpecialType.VerticalStriped, 4)]
+        [TestCase(SpecialType.Wrapped, SpecialType.Wrapped, 12)]
+        [TestCase(SpecialType.Wrapped, SpecialType.ColorBomb, 0)]
+        public void TrySwap_SpecialHitsSpecial_ActivatesSecondNormally(
+            SpecialType sourceSpecial,
+            SpecialType targetSpecial,
+            int uniquelyAffectedTileId)
         {
-            Board board = BoardFixture.Create("RGBYG", "GBYRG", "RRRBG");
-            board[0, 2].Special = SpecialType.HorizontalStriped;
-            board[4, 2].Special = SpecialType.ColorBomb;
-            board[4, 2].Color = -1;
+            Board board = CreateIndirectChainBoard(sourceSpecial, targetSpecial);
             var service = new GameService(board, new[] { 0, 1, 2, 3 });
 
-            MoveResult result = TrySwapDeterministically(service, 0, 2, 1, 2);
+            MoveResult result = TrySwapDeterministically(service, 4, 4, 5, 4);
 
-            Assert.That(result.BoardSequences[0].MatchedPosition, Does.Contain(new Vector2Int(4, 2)));
-            Assert.That(result.BoardSequences[0].SpecialActivations.Any(info =>
-                info.Special == SpecialType.ColorBomb), Is.False);
+            Vector2Int targetPosition = sourceSpecial == SpecialType.Wrapped
+                ? new Vector2Int(4, 3)
+                : new Vector2Int(1, 4);
+            SpecialActivationInfo targetActivation = result.BoardSequences
+                .SelectMany(sequence => sequence.SpecialActivations)
+                .Single(info => info.Position == targetPosition &&
+                    info.Special == targetSpecial && info.Phase == SpecialActivationPhase.First);
+            Assert.That(targetActivation.CombinedWith, Is.Null,
+                "An indirectly hit special must use its normal effect, not a direct-swap combination.");
+            Assert.That(ContainsTileId(service.Board, uniquelyAffectedTileId), Is.False);
+            Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations)
+                .Any(info => info.Special == SpecialType.None), Is.False);
+
+            int expectedWrappedPhases = (sourceSpecial == SpecialType.Wrapped ? 1 : 0) +
+                                        (targetSpecial == SpecialType.Wrapped ? 1 : 0);
+            if (expectedWrappedPhases > 0)
+            {
+                Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations).Count(info =>
+                    info.Special == SpecialType.Wrapped && info.Phase == SpecialActivationPhase.Second),
+                    Is.GreaterThanOrEqualTo(expectedWrappedPhases));
+            }
+
+            if (targetSpecial == SpecialType.ColorBomb)
+            {
+                Assert.That(targetActivation.TargetColor, Is.EqualTo(0));
+            }
+        }
+
+        [Test]
+        public void TrySwap_TwoEffectsHitSameSpecial_ActivatesItOnceInPhase()
+        {
+            Board board = CreateIndirectChainBoard(
+                SpecialType.HorizontalStriped,
+                SpecialType.Wrapped);
+            SetSpecial(board[2, 4], SpecialType.VerticalStriped, 2);
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 4, 4, 5, 4);
+
+            Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations).Count(info =>
+                info.Position == new Vector2Int(2, 4) &&
+                info.Special == SpecialType.VerticalStriped &&
+                info.Phase == SpecialActivationPhase.First), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TrySwap_IndirectColorBombColorTie_ChoosesLowerColorAndReportsIt()
+        {
+            Board board = CreateIndirectChainBoard(
+                SpecialType.HorizontalStriped,
+                SpecialType.ColorBomb);
+            board[0, 0].Color = 1;
+            var service = new GameService(board, new[] { 0, 1, 2, 3 });
+
+            MoveResult result = TrySwapDeterministically(service, 4, 4, 5, 4);
+
+            SpecialActivationInfo activation = result.BoardSequences
+                .SelectMany(sequence => sequence.SpecialActivations)
+                .Single(info => info.Special == SpecialType.ColorBomb);
+            Assert.That(activation.TargetColor, Is.EqualTo(0));
+            Assert.That(ContainsTileId(service.Board, 2), Is.False);
         }
 
         private static Board CreateColorBombBoard()
@@ -272,6 +335,35 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
             board[1, 0].Special = second;
             board[1, 0].Color = second == SpecialType.ColorBomb ? -1 : 1;
             return board;
+        }
+
+        private static Board CreateIndirectChainBoard(SpecialType source, SpecialType target)
+        {
+            Board board = BoardFixture.Create(
+                "RGRGRGRGR",
+                "GRGRGRGRG",
+                "RGRGRGRGR",
+                "GRGRGRGRG",
+                "RGRGRGRGR",
+                "GRGRGRGRG",
+                "RGRGRGRGR",
+                "GRGRGRGRG",
+                "RGRGRGRGR");
+            board[6, 4].Color = 0;
+            board[7, 4].Color = 0;
+            board[8, 4].Color = 1;
+            SetSpecial(board[4, 4], source, 0);
+            Vector2Int targetPosition = source == SpecialType.Wrapped
+                ? new Vector2Int(4, 3)
+                : new Vector2Int(1, 4);
+            SetSpecial(board[targetPosition.x, targetPosition.y], target, 1);
+            return board;
+        }
+
+        private static void SetSpecial(Tile tile, SpecialType special, int color)
+        {
+            tile.Special = special;
+            tile.Color = special == SpecialType.ColorBomb ? -1 : color;
         }
 
         private static MoveResult TrySwapDeterministically(GameService service, int fromX, int fromY, int toX, int toY)
