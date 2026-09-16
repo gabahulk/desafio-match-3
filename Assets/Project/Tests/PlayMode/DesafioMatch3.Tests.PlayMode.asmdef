@@ -2,7 +2,8 @@
     "name": "DesafioMatch3.Tests.PlayMode",
     "rootNamespace": "Gazeus.DesafioMatch3.Tests.PlayMode",
     "references": [
-        "DesafioMatch3"
+        "DesafioMatch3",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

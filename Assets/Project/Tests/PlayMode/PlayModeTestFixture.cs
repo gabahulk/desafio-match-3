@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 using Random = UnityEngine.Random;
 
 namespace Gazeus.DesafioMatch3.Tests.PlayMode
@@ -121,11 +122,11 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             }
         }
 
-        internal static Text FindScoreText()
+        internal static TMP_Text FindScoreText()
         {
             GameObject scoreObject = GameObject.Find("Score");
             Assert.That(scoreObject, Is.Not.Null, "The score display was not found in the Gameplay UI.");
-            Text scoreText = scoreObject.GetComponent<Text>();
+            TMP_Text scoreText = scoreObject.transform.Find("Value").GetComponent<TMP_Text>();
             Assert.That(scoreText, Is.Not.Null);
             return scoreText;
         }

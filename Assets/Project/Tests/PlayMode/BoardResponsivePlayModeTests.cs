@@ -5,6 +5,7 @@ using Gazeus.DesafioMatch3.Controllers;
 using Gazeus.DesafioMatch3.Models;
 using Gazeus.DesafioMatch3.Views;
 using NUnit.Framework;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -72,12 +73,17 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 RectTransform boardRegion = (RectTransform)GameObject.Find("BoardRegion").transform;
                 RectTransform boardFrame = (RectTransform)GameObject.Find("BoardFrame").transform;
                 RectTransform boardContent = (RectTransform)GameObject.Find("BoardContent").transform;
+                RectTransform score = (RectTransform)GameObject.Find("Score").transform;
                 Image boardFrameImage = boardFrame.GetComponent<Image>();
+                Image plaque = score.Find("Plaque").GetComponent<Image>();
+                TMP_Text label = score.Find("Label").GetComponent<TMP_Text>();
+                TMP_Text value = score.Find("Value").GetComponent<TMP_Text>();
                 Image background = GameObject.Find("Background").GetComponent<Image>();
                 BoardFrameResponsiveController frameResponsiveController =
                     boardRegion.GetComponent<BoardFrameResponsiveController>();
                 BoardResponsiveController responsiveController =
                     UnityEngine.Object.FindFirstObjectByType<BoardResponsiveController>();
+                ScoreResponsiveController scoreResponsiveController = score.GetComponent<ScoreResponsiveController>();
                 RectTransform boardContainer = responsiveController.GetComponent<RectTransform>();
                 AspectRatioFitter aspectRatioFitter = responsiveController.GetComponent<AspectRatioFitter>();
                 AspectRatioFitter frameAspectRatioFitter = boardFrame.GetComponent<AspectRatioFitter>();
@@ -91,8 +97,13 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                     boardFrame,
                     boardContent,
                     boardFrameImage,
+                    score,
+                    plaque,
+                    label,
+                    value,
                     background,
-                    frameResponsiveController);
+                    frameResponsiveController,
+                    scoreResponsiveController);
                 Assert.That(aspectRatioFitter.aspectMode,
                     Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent));
                 Assert.That(tileSpots, Has.Length.EqualTo(boardSize.x * boardSize.y));
@@ -119,6 +130,8 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                         boardFrame,
                         boardContent,
                         boardContainer,
+                        score,
+                        canvasRect,
                         aspectRatioFitter,
                         frameAspectRatioFitter,
                         gridLayoutGroup,
@@ -145,8 +158,13 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             RectTransform boardFrame,
             RectTransform boardContent,
             Image boardFrameImage,
+            RectTransform score,
+            Image plaque,
+            TMP_Text label,
+            TMP_Text value,
             Image background,
-            BoardFrameResponsiveController frameResponsiveController)
+            BoardFrameResponsiveController frameResponsiveController,
+            ScoreResponsiveController scoreResponsiveController)
         {
             Assert.That(boardRegion.parent.name, Is.EqualTo("Canvas"));
             Assert.That(boardFrame.parent, Is.EqualTo(boardRegion));
@@ -156,10 +174,20 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(boardFrameImage.sprite, Is.Not.Null);
             Assert.That(boardFrameImage.sprite.border, Is.EqualTo(new Vector4(150, 150, 150, 150)));
             Assert.That(boardFrameImage.raycastTarget, Is.False);
+            Assert.That(score.parent.name, Is.EqualTo("Canvas"));
+            Assert.That(plaque.type, Is.EqualTo(Image.Type.Simple));
+            Assert.That(plaque.preserveAspect, Is.True);
+            Assert.That(plaque.raycastTarget, Is.False);
+            Assert.That(label.text, Is.EqualTo("SCORE"));
+            Assert.That(label.raycastTarget, Is.False);
+            Assert.That(value.text, Is.EqualTo("0"));
+            Assert.That(value.raycastTarget, Is.False);
+            Assert.That(value.font, Is.Not.Null);
             Assert.That(background, Is.Not.Null);
             Assert.That(background.sprite, Is.Not.Null);
             Assert.That(background.raycastTarget, Is.False);
             Assert.That(frameResponsiveController, Is.Not.Null);
+            Assert.That(scoreResponsiveController, Is.Not.Null);
         }
 
         private static void AssertLayout(
@@ -169,6 +197,8 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             RectTransform boardFrame,
             RectTransform boardContent,
             RectTransform boardContainer,
+            RectTransform score,
+            RectTransform canvasRect,
             AspectRatioFitter aspectRatioFitter,
             AspectRatioFitter frameAspectRatioFitter,
             GridLayoutGroup gridLayoutGroup,
@@ -218,6 +248,8 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(gridLayoutGroup.cellSize.y * boardSize.y,
                 Is.LessThanOrEqualTo(boardContainer.rect.height + 0.05f), caseName);
 
+            AssertScorePlacement(score, boardContainer, canvasRect, caseName);
+
             Vector3 offsetCenter = boardFrame.TransformPoint(boardFrame.rect.center);
             Vector3 boardCenter = boardContainer.TransformPoint(boardContainer.rect.center);
             Assert.That(Vector3.Distance(offsetCenter, boardCenter), Is.LessThan(0.05f), caseName);
@@ -232,6 +264,24 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             }
         }
 
+        private static void AssertScorePlacement(
+            RectTransform score,
+            RectTransform boardContainer,
+            RectTransform canvasRect,
+            string caseName)
+        {
+            Vector3 scoreBottom = canvasRect.InverseTransformPoint(
+                score.TransformPoint(new Vector3(0.0f, score.rect.yMin, 0.0f)));
+            Vector3 boardTop = canvasRect.InverseTransformPoint(
+                boardContainer.TransformPoint(new Vector3(0.0f, boardContainer.rect.yMax, 0.0f)));
+            Vector3 scoreTop = canvasRect.InverseTransformPoint(
+                score.TransformPoint(new Vector3(0.0f, score.rect.yMax, 0.0f)));
+
+            Assert.That(scoreBottom.y, Is.GreaterThanOrEqualTo(boardTop.y - 0.05f), caseName);
+            Assert.That(scoreTop.y, Is.LessThanOrEqualTo(canvasRect.rect.yMax - 20.0f + 0.05f), caseName);
+            Assert.That(score.anchoredPosition.x, Is.EqualTo(0.0f).Within(0.05f), caseName);
+        }
+
         private static void AssertPresentationProfile(
             Vector2Int viewport,
             RectTransform boardRegion,
@@ -240,7 +290,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         {
             bool isPortrait = viewport.y > viewport.x;
             Vector2 expectedMin = isPortrait ? new Vector2(0, 0.17f) : new Vector2(0.17f, 0.05f);
-            Vector2 expectedMax = isPortrait ? new Vector2(1, 0.83f) : new Vector2(0.84f, 0.95f);
+            Vector2 expectedMax = isPortrait ? new Vector2(1, 0.83f) : new Vector2(0.84f, 0.85f);
 
             Assert.That(boardRegion.anchorMin, Is.EqualTo(expectedMin), caseName);
             Assert.That(boardRegion.anchorMax, Is.EqualTo(expectedMax), caseName);
