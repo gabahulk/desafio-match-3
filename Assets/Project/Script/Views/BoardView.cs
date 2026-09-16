@@ -14,7 +14,7 @@ namespace Gazeus.DesafioMatch3.Views
 
         [SerializeField] private GridLayoutGroup _boardContainer;
         [SerializeField] private BoardResponsiveController _responsiveController;
-        [SerializeField] private TilePrefabRepository _tilePrefabRepository;
+        [SerializeField] private TileVisualRepository _tileVisualRepository;
         [SerializeField] private TileSpotView _tileSpotPrefab;
 
         private GameObject[][] _tiles;
@@ -42,10 +42,10 @@ namespace Gazeus.DesafioMatch3.Views
 
                     if (!board[x, y].IsEmpty)
                     {
-                        GameObject tilePrefab = GetTilePrefab(board[x, y]);
-                        GameObject tile = Instantiate(tilePrefab);
+                        Tile tileData = board[x, y];
+                        GameObject tile = Instantiate(_tileVisualRepository.TilePrefab);
                         tileSpot.SetTile(tile);
-                        ApplySpecialVisual(tile, board[x, y].Special);
+                        ApplyTileVisual(tile, tileData.Color, tileData.Special);
 
                         _tiles[y][x] = tile;
                     }
@@ -63,9 +63,9 @@ namespace Gazeus.DesafioMatch3.Views
 
                 TileSpotView tileSpot = _tileSpots[position.y][position.x];
 
-                GameObject tilePrefab = _tilePrefabRepository.ColorPrefabList[addedTileInfo.Color];
-                GameObject tile = Instantiate(tilePrefab);
+                GameObject tile = Instantiate(_tileVisualRepository.TilePrefab);
                 tileSpot.SetTile(tile);
+                ApplyTileVisual(tile, addedTileInfo.Color, SpecialType.None);
 
                 _tiles[position.y][position.x] = tile;
 
@@ -92,7 +92,7 @@ namespace Gazeus.DesafioMatch3.Views
             {
                 SpecialTileInfo specialTile = specialTiles[index];
                 GameObject tile = _tiles[specialTile.Position.y][specialTile.Position.x];
-                ApplySpecialVisual(tile, specialTile.Special);
+                ApplyTileVisual(tile, specialTile.Color, specialTile.Special);
             }
         }
 
@@ -170,156 +170,15 @@ namespace Gazeus.DesafioMatch3.Views
             return sequence;
         }
 
-        private static void ApplySpecialVisual(GameObject tile, SpecialType special)
+        private void ApplyTileVisual(GameObject tile, int color, SpecialType special)
         {
             if (tile == null)
             {
                 return;
             }
 
-            string overlayName = $"{special} Overlay";
-            RemoveOtherSpecialVisuals(tile, overlayName);
-            if (special == SpecialType.None)
-            {
-                return;
-            }
-
-            if (tile.transform.Find(overlayName) != null)
-            {
-                return;
-            }
-
-            if (special == SpecialType.Wrapped)
-            {
-                CreateWrappedOverlay(tile, overlayName);
-                return;
-            }
-
-            if (special == SpecialType.ColorBomb)
-            {
-                CreateColorBombOverlay(tile, overlayName);
-                return;
-            }
-
-            if (special != SpecialType.HorizontalStriped &&
-                special != SpecialType.VerticalStriped)
-            {
-                return;
-            }
-
-            GameObject overlay = new(overlayName, typeof(RectTransform), typeof(Image));
-            RectTransform rectTransform = (RectTransform)overlay.transform;
-            rectTransform.SetParent(tile.transform, false);
-
-            if (special == SpecialType.HorizontalStriped)
-            {
-                rectTransform.anchorMin = new Vector2(0.1f, 0.42f);
-                rectTransform.anchorMax = new Vector2(0.9f, 0.58f);
-            }
-            else
-            {
-                rectTransform.anchorMin = new Vector2(0.42f, 0.1f);
-                rectTransform.anchorMax = new Vector2(0.58f, 0.9f);
-            }
-
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
-
-            Image stripe = overlay.GetComponent<Image>();
-            stripe.color = new Color(1.0f, 1.0f, 1.0f, 0.85f);
-            stripe.raycastTarget = false;
-        }
-
-        private static void RemoveOtherSpecialVisuals(GameObject tile, string retainedOverlayName)
-        {
-            SpecialType[] visualTypes =
-            {
-                SpecialType.HorizontalStriped,
-                SpecialType.VerticalStriped,
-                SpecialType.Wrapped,
-                SpecialType.ColorBomb
-            };
-
-            for (int index = 0; index < visualTypes.Length; index++)
-            {
-                string overlayName = $"{visualTypes[index]} Overlay";
-                if (overlayName == retainedOverlayName)
-                {
-                    continue;
-                }
-
-                Transform overlay = tile.transform.Find(overlayName);
-                if (overlay == null)
-                {
-                    continue;
-                }
-
-                overlay.gameObject.SetActive(false);
-                if (Application.isPlaying)
-                {
-                    Destroy(overlay.gameObject);
-                }
-                else
-                {
-                    DestroyImmediate(overlay.gameObject);
-                }
-            }
-        }
-
-        private GameObject GetTilePrefab(Tile tile)
-        {
-            int colorIndex = tile.Special == SpecialType.ColorBomb ? 0 : tile.Color;
-            return _tilePrefabRepository.ColorPrefabList[colorIndex];
-        }
-
-        private static void CreateColorBombOverlay(GameObject tile, string overlayName)
-        {
-            GameObject overlay = new(overlayName, typeof(RectTransform), typeof(Image));
-            RectTransform rect = (RectTransform)overlay.transform;
-            rect.SetParent(tile.transform, false);
-            rect.anchorMin = new Vector2(0.18f, 0.18f);
-            rect.anchorMax = new Vector2(0.82f, 0.82f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            Image image = overlay.GetComponent<Image>();
-            image.color = new Color(0.18f, 0.08f, 0.35f, 1.0f);
-            image.raycastTarget = false;
-        }
-
-        private static void CreateWrappedOverlay(GameObject tile, string overlayName)
-        {
-            GameObject overlay = new(overlayName, typeof(RectTransform));
-            RectTransform overlayRect = (RectTransform)overlay.transform;
-            overlayRect.SetParent(tile.transform, false);
-            overlayRect.anchorMin = Vector2.zero;
-            overlayRect.anchorMax = Vector2.one;
-            overlayRect.offsetMin = Vector2.zero;
-            overlayRect.offsetMax = Vector2.zero;
-
-            CreateWrappedEdge(overlayRect, "Top", new Vector2(0.08f, 0.78f), new Vector2(0.92f, 0.92f));
-            CreateWrappedEdge(overlayRect, "Bottom", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.22f));
-            CreateWrappedEdge(overlayRect, "Left", new Vector2(0.08f, 0.22f), new Vector2(0.22f, 0.78f));
-            CreateWrappedEdge(overlayRect, "Right", new Vector2(0.78f, 0.22f), new Vector2(0.92f, 0.78f));
-        }
-
-        private static void CreateWrappedEdge(
-            RectTransform parent,
-            string name,
-            Vector2 anchorMin,
-            Vector2 anchorMax)
-        {
-            GameObject edge = new(name, typeof(RectTransform), typeof(Image));
-            RectTransform edgeRect = (RectTransform)edge.transform;
-            edgeRect.SetParent(parent, false);
-            edgeRect.anchorMin = anchorMin;
-            edgeRect.anchorMax = anchorMax;
-            edgeRect.offsetMin = Vector2.zero;
-            edgeRect.offsetMax = Vector2.zero;
-
-            Image image = edge.GetComponent<Image>();
-            image.color = new Color(1.0f, 0.72f, 0.15f, 0.95f);
-            image.raycastTarget = false;
+            Image image = tile.GetComponent<Image>();
+            image.sprite = _tileVisualRepository.GetSprite(color, special);
         }
 
         #region Events

@@ -38,8 +38,10 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                     Assert.That(specialTile.Id, Is.EqualTo(expectedTileId));
 
                     TileSpotView tileSpot = FindTileSpot(expectedPosition);
-                    Assert.That(FindDescendant(tileSpot.transform, $"{expectedSpecial} Overlay"),
-                        Is.Not.Null, $"{expectedSpecial} was not rendered at {expectedPosition}.");
+                    Image image = tileSpot.GetComponentInChildren<Image>();
+                    Assert.That(image.sprite.name,
+                        Is.EqualTo(GetExpectedSpriteName(specialTile)),
+                        $"{expectedSpecial} was not rendered at {expectedPosition}.");
                 });
         }
 
@@ -208,9 +210,14 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             SpecialType second,
             bool useCornerTargets = false)
         {
-            Board board = CreateCombinationBoard(first, second);
+            Board board = CreateBoard(
+                "RGBRGBRGB", "GBRGBRGBR", "BRGBRGBRG",
+                "RGBRGBRGB", "GBRGBRGBR", "BRGBRGBRG",
+                "RGBRGBRGB", "GBRGBRGBR", "BRGBRGBRG");
+            SetSpecial(board[4, 4], first, 0);
+            SetSpecial(board[5, 4], second, 1);
             Tile partner = first == SpecialType.ColorBomb ? board[5, 4] : board[4, 4];
-            partner.Color = 4;
+            partner.Color = 3;
 
             Vector2Int[] targets = useCornerTargets
                 ? new[] { new Vector2Int(0, 0), new Vector2Int(8, 0), new Vector2Int(0, 8) }
@@ -218,7 +225,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             for (int index = 0; index < targets.Length; index++)
             {
                 Vector2Int target = targets[index];
-                board[target.x, target.y].Color = 4;
+                board[target.x, target.y].Color = 3;
             }
 
             return board;
@@ -328,26 +335,6 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             return null;
         }
 
-        private static Transform FindDescendant(Transform parent, string name)
-        {
-            for (int index = 0; index < parent.childCount; index++)
-            {
-                Transform child = parent.GetChild(index);
-                if (child.name == name)
-                {
-                    return child;
-                }
-
-                Transform descendant = FindDescendant(child, name);
-                if (descendant != null)
-                {
-                    return descendant;
-                }
-            }
-
-            return null;
-        }
-
         private static int CountSpecials(Board board, SpecialType? special = null)
         {
             int count = 0;
@@ -377,10 +364,47 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
 
                 if (tile.Special != SpecialType.None)
                 {
-                    Assert.That(FindDescendant(tileSpot.transform, $"{tile.Special} Overlay"),
-                        Is.Not.Null, $"{tile.Special} is missing its overlay at ({x}, {y}).");
+                    Assert.That(tileSpot.transform.GetChild(0).childCount, Is.Zero,
+                        $"{tile.Special} should be represented without a procedural overlay.");
+                }
+
+                if (!tile.IsEmpty)
+                {
+                    Image image = tileSpot.GetComponentInChildren<Image>();
+                    Assert.That(image.sprite, Is.Not.Null,
+                        $"Tile at ({x}, {y}) is missing its sprite.");
+                    Assert.That(image.sprite.name, Is.EqualTo(GetExpectedSpriteName(tile)),
+                        $"Tile at ({x}, {y}) uses the wrong visual.");
                 }
             }
+        }
+
+        private static string GetExpectedSpriteName(Tile tile)
+        {
+            if (tile.Special == SpecialType.ColorBomb)
+            {
+                return "tile-joker";
+            }
+
+            string suit = tile.Color switch
+            {
+                0 => "spades",
+                1 => "clubs",
+                2 => "diamond",
+                3 => "heart",
+                _ => throw new ArgumentOutOfRangeException(nameof(tile.Color))
+            };
+
+            string suffix = tile.Special switch
+            {
+                SpecialType.None => string.Empty,
+                SpecialType.HorizontalStriped => "-horizontal",
+                SpecialType.VerticalStriped => "-vertical",
+                SpecialType.Wrapped => "-wrapped",
+                _ => throw new ArgumentOutOfRangeException(nameof(tile.Special))
+            };
+
+            return $"tile-{suit}{suffix}";
         }
 
         private static void AssertBoardHasNoMatches(Board board)

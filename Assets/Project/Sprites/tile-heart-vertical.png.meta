@@ -1,0 +1,637 @@
+fileFormatVersion: 2
+guid: 5e9d5366799683a4ab6c0aa19b56db5c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -780652958189779763
+    second: tile-heart-vertical_0
+  - first:
+      213: 6629040090849139606
+    second: tile-heart-vertical_1
+  - first:
+      213: -4105590385018491079
+    second: tile-heart-vertical_2
+  - first:
+      213: 2420479046815973567
+    second: tile-heart-vertical_3
+  - first:
+      213: 3323686832781549394
+    second: tile-heart-vertical_4
+  - first:
+      213: -7776647381198359851
+    second: tile-heart-vertical_5
+  - first:
+      213: 509954346058239874
+    second: tile-heart-vertical_6
+  - first:
+      213: 8222249123544408965
+    second: tile-heart-vertical_7
+  - first:
+      213: -648193651400100496
+    second: tile-heart-vertical_8
+  - first:
+      213: 6056113239388982652
+    second: tile-heart-vertical_9
+  - first:
+      213: 3682376397399385487
+    second: tile-heart-vertical_10
+  - first:
+      213: -7968931150141616298
+    second: tile-heart-vertical_11
+  - first:
+      213: -6285159283806899719
+    second: tile-heart-vertical_12
+  - first:
+      213: 1427323044819133195
+    second: tile-heart-vertical_13
+  - first:
+      213: 2223128264463674179
+    second: tile-heart-vertical_14
+  - first:
+      213: 8955035972728811342
+    second: tile-heart-vertical_15
+  - first:
+      213: 9211489092188394666
+    second: tile-heart-vertical_16
+  - first:
+      213: 499945703296111604
+    second: tile-heart-vertical_17
+  - first:
+      213: 7860312582066830400
+    second: tile-heart-vertical_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: tile-heart-vertical_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1201
+        height: 1134
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc48d3645409a25f0800000000000000
+      internalID: -780652958189779763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_1
+      rect:
+        serializedVersion: 2
+        x: 667
+        y: 1128
+        width: 77
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69bd2e827d41ffb50800000000000000
+      internalID: 6629040090849139606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_2
+      rect:
+        serializedVersion: 2
+        x: 754
+        y: 1114
+        width: 23
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93fa6b31c430607c0800000000000000
+      internalID: -4105590385018491079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_3
+      rect:
+        serializedVersion: 2
+        x: 1109
+        y: 226
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb00ebb6ed4479120800000000000000
+      internalID: 2420479046815973567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_4
+      rect:
+        serializedVersion: 2
+        x: 1115
+        y: 190
+        width: 36
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25f5694909b102e20800000000000000
+      internalID: 3323686832781549394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_5
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 128
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d23334c86cc31490800000000000000
+      internalID: -7776647381198359851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_6
+      rect:
+        serializedVersion: 2
+        x: 1049
+        y: 107
+        width: 27
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28fc770a6c8b31700800000000000000
+      internalID: 509954346058239874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_7
+      rect:
+        serializedVersion: 2
+        x: 304
+        y: 92
+        width: 17
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 583a1a7b30c4b1270800000000000000
+      internalID: 8222249123544408965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_8
+      rect:
+        serializedVersion: 2
+        x: 545
+        y: 73
+        width: 41
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07532aeee472107f0800000000000000
+      internalID: -648193651400100496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_9
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 77
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7d025197e2ab0450800000000000000
+      internalID: 6056113239388982652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_10
+      rect:
+        serializedVersion: 2
+        x: 667
+        y: 63
+        width: 39
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f85e548c2dd6a1330800000000000000
+      internalID: 3682376397399385487
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_11
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 67
+        width: 22
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65f8344175ba86190800000000000000
+      internalID: -7968931150141616298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_12
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 65
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f1f0fb7ee0a6c8a0800000000000000
+      internalID: -6285159283806899719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_13
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 65
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b036c2a3fbedec310800000000000000
+      internalID: 1427323044819133195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_14
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 63
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34bec7db0632ade10800000000000000
+      internalID: 2223128264463674179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_15
+      rect:
+        serializedVersion: 2
+        x: 647
+        y: 63
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4f685975cda64c70800000000000000
+      internalID: 8955035972728811342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_16
+      rect:
+        serializedVersion: 2
+        x: 693
+        y: 65
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa456485688c5df70800000000000000
+      internalID: 9211489092188394666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_17
+      rect:
+        serializedVersion: 2
+        x: 549
+        y: 49
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f392f3e7f920f600800000000000000
+      internalID: 499945703296111604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-heart-vertical_18
+      rect:
+        serializedVersion: 2
+        x: 675
+        y: 47
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04c70adc5a0751d60800000000000000
+      internalID: 7860312582066830400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      tile-heart-vertical_0: -780652958189779763
+      tile-heart-vertical_1: 6629040090849139606
+      tile-heart-vertical_10: 3682376397399385487
+      tile-heart-vertical_11: -7968931150141616298
+      tile-heart-vertical_12: -6285159283806899719
+      tile-heart-vertical_13: 1427323044819133195
+      tile-heart-vertical_14: 2223128264463674179
+      tile-heart-vertical_15: 8955035972728811342
+      tile-heart-vertical_16: 9211489092188394666
+      tile-heart-vertical_17: 499945703296111604
+      tile-heart-vertical_18: 7860312582066830400
+      tile-heart-vertical_2: -4105590385018491079
+      tile-heart-vertical_3: 2420479046815973567
+      tile-heart-vertical_4: 3323686832781549394
+      tile-heart-vertical_5: -7776647381198359851
+      tile-heart-vertical_6: 509954346058239874
+      tile-heart-vertical_7: 8222249123544408965
+      tile-heart-vertical_8: -648193651400100496
+      tile-heart-vertical_9: 6056113239388982652
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

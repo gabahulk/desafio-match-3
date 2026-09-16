@@ -1,0 +1,793 @@
+fileFormatVersion: 2
+guid: bcae36bd9a2f9184ca8c53b09153e1ee
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6013443988402128506
+    second: tile-clubs_0
+  - first:
+      213: 7906392739106701586
+    second: tile-clubs_1
+  - first:
+      213: 6971069548138972815
+    second: tile-clubs_2
+  - first:
+      213: -5529677029694452001
+    second: tile-clubs_3
+  - first:
+      213: -6293161131880131818
+    second: tile-clubs_4
+  - first:
+      213: 9047070659771425001
+    second: tile-clubs_5
+  - first:
+      213: -3344472360261328794
+    second: tile-clubs_6
+  - first:
+      213: 3138765613579424827
+    second: tile-clubs_7
+  - first:
+      213: -4658303582701972500
+    second: tile-clubs_8
+  - first:
+      213: -2972963545985179511
+    second: tile-clubs_9
+  - first:
+      213: 1520383314744257074
+    second: tile-clubs_10
+  - first:
+      213: -188755474309728447
+    second: tile-clubs_11
+  - first:
+      213: -1209346566536580468
+    second: tile-clubs_12
+  - first:
+      213: -5517825426091383888
+    second: tile-clubs_13
+  - first:
+      213: 4652828362958411772
+    second: tile-clubs_14
+  - first:
+      213: -5290491694882494542
+    second: tile-clubs_15
+  - first:
+      213: 1796174076975383406
+    second: tile-clubs_16
+  - first:
+      213: 5984686493127504316
+    second: tile-clubs_17
+  - first:
+      213: 6254164811732683758
+    second: tile-clubs_18
+  - first:
+      213: 246043183695909849
+    second: tile-clubs_19
+  - first:
+      213: -7179106366486961120
+    second: tile-clubs_20
+  - first:
+      213: -5764872708158409556
+    second: tile-clubs_21
+  - first:
+      213: 3575435297344031351
+    second: tile-clubs_22
+  - first:
+      213: 9113091228681971249
+    second: tile-clubs_23
+  - first:
+      213: -6286679751020064106
+    second: tile-clubs_24
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: tile-clubs_0
+      rect:
+        serializedVersion: 2
+        x: 1077
+        y: 1245
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a76ca65627b047350800000000000000
+      internalID: 6013443988402128506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_1
+      rect:
+        serializedVersion: 2
+        x: 1077
+        y: 1225
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 211ce2d6e4629bd60800000000000000
+      internalID: 7906392739106701586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_2
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 1187
+        width: 93
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f86cd59d1d63eb060800000000000000
+      internalID: 6971069548138972815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 31
+        width: 1128
+        height: 1155
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdecc6af904a243b0800000000000000
+      internalID: -5529677029694452001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_4
+      rect:
+        serializedVersion: 2
+        x: 1176
+        y: 884
+        width: 52
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6135dfb0b433aa8a0800000000000000
+      internalID: -6293161131880131818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_5
+      rect:
+        serializedVersion: 2
+        x: 1165
+        y: 730
+        width: 45
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e0e885e4d6ad8d70800000000000000
+      internalID: 9047070659771425001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_6
+      rect:
+        serializedVersion: 2
+        x: 1167
+        y: 781
+        width: 50
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 660e28dab1c0691d0800000000000000
+      internalID: -3344472360261328794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_7
+      rect:
+        serializedVersion: 2
+        x: 1170
+        y: 682
+        width: 53
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b34dc9612b22f8b20800000000000000
+      internalID: 3138765613579424827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_8
+      rect:
+        serializedVersion: 2
+        x: 1172
+        y: 640
+        width: 37
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce39e1182916a5fb0800000000000000
+      internalID: -4658303582701972500
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_9
+      rect:
+        serializedVersion: 2
+        x: 1196
+        y: 704
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9802e570869edb6d0800000000000000
+      internalID: -2972963545985179511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_10
+      rect:
+        serializedVersion: 2
+        x: 1163
+        y: 624
+        width: 26
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23a23c5c19c791510800000000000000
+      internalID: 1520383314744257074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_11
+      rect:
+        serializedVersion: 2
+        x: 1170
+        y: 584
+        width: 15
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 147bb5c65e7616df0800000000000000
+      internalID: -188755474309728447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_12
+      rect:
+        serializedVersion: 2
+        x: 1176
+        y: 578
+        width: 43
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c82bf3384b9873fe0800000000000000
+      internalID: -1209346566536580468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_13
+      rect:
+        serializedVersion: 2
+        x: 1170
+        y: 457
+        width: 45
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b36439720fbc63b0800000000000000
+      internalID: -5517825426091383888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_14
+      rect:
+        serializedVersion: 2
+        x: 1172
+        y: 540
+        width: 11
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf79ffe8eba229040800000000000000
+      internalID: 4652828362958411772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_15
+      rect:
+        serializedVersion: 2
+        x: 1180
+        y: 542
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b7ef5f65d56496b0800000000000000
+      internalID: -5290491694882494542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_16
+      rect:
+        serializedVersion: 2
+        x: 1196
+        y: 487
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6302e47eca4de810800000000000000
+      internalID: 1796174076975383406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_17
+      rect:
+        serializedVersion: 2
+        x: 1164
+        y: 469
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb171f248a0ed0350800000000000000
+      internalID: 5984686493127504316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_18
+      rect:
+        serializedVersion: 2
+        x: 1165
+        y: 466
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eeb0312a2c14bc650800000000000000
+      internalID: 6254164811732683758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_19
+      rect:
+        serializedVersion: 2
+        x: 1157
+        y: 415
+        width: 58
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d3d993d8fe1a6300800000000000000
+      internalID: 246043183695909849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_20
+      rect:
+        serializedVersion: 2
+        x: 1194
+        y: 439
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 024acc4dbc0be5c90800000000000000
+      internalID: -7179106366486961120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_21
+      rect:
+        serializedVersion: 2
+        x: 1127
+        y: 196
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca4bfd6c0de0fffa0800000000000000
+      internalID: -5764872708158409556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_22
+      rect:
+        serializedVersion: 2
+        x: 818
+        y: 69
+        width: 15
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77a859f957f7e9130800000000000000
+      internalID: 3575435297344031351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_23
+      rect:
+        serializedVersion: 2
+        x: 834
+        y: 63
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13621537034387e70800000000000000
+      internalID: 9113091228681971249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tile-clubs_24
+      rect:
+        serializedVersion: 2
+        x: 841
+        y: 61
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 692decf131a31c8a0800000000000000
+      internalID: -6286679751020064106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      tile-clubs_0: 6013443988402128506
+      tile-clubs_1: 7906392739106701586
+      tile-clubs_10: 1520383314744257074
+      tile-clubs_11: -188755474309728447
+      tile-clubs_12: -1209346566536580468
+      tile-clubs_13: -5517825426091383888
+      tile-clubs_14: 4652828362958411772
+      tile-clubs_15: -5290491694882494542
+      tile-clubs_16: 1796174076975383406
+      tile-clubs_17: 5984686493127504316
+      tile-clubs_18: 6254164811732683758
+      tile-clubs_19: 246043183695909849
+      tile-clubs_2: 6971069548138972815
+      tile-clubs_20: -7179106366486961120
+      tile-clubs_21: -5764872708158409556
+      tile-clubs_22: 3575435297344031351
+      tile-clubs_23: 9113091228681971249
+      tile-clubs_24: -6286679751020064106
+      tile-clubs_3: -5529677029694452001
+      tile-clubs_4: -6293161131880131818
+      tile-clubs_5: 9047070659771425001
+      tile-clubs_6: -3344472360261328794
+      tile-clubs_7: 3138765613579424827
+      tile-clubs_8: -4658303582701972500
+      tile-clubs_9: -2972963545985179511
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
