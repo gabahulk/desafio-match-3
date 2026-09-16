@@ -76,7 +76,8 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 RectTransform score = (RectTransform)GameObject.Find("Score").transform;
                 Image boardFrameImage = boardFrame.GetComponent<Image>();
                 Image plaque = score.Find("Plaque").GetComponent<Image>();
-                TMP_Text scoreText = score.Find("ScoreText").GetComponent<TMP_Text>();
+                TMP_Text label = score.Find("Label").GetComponent<TMP_Text>();
+                TMP_Text value = score.Find("Value").GetComponent<TMP_Text>();
                 Image background = GameObject.Find("Background").GetComponent<Image>();
                 BoardFrameResponsiveController frameResponsiveController =
                     boardRegion.GetComponent<BoardFrameResponsiveController>();
@@ -101,7 +102,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                     frameResponsiveController);
                 Assert.That(aspectRatioFitter.aspectMode,
                     Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent));
-                AssertScoreAnchoring(score, scoreText);
+                AssertScoreAnchoring(score, label, value);
                 Assert.That(tileSpots, Has.Length.EqualTo(boardSize.x * boardSize.y));
                 AssertTileCoordinates(tileSpots, boardSize);
 
@@ -166,7 +167,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(boardFrameImage.sprite.border, Is.EqualTo(new Vector4(150, 150, 150, 150)));
             Assert.That(boardFrameImage.raycastTarget, Is.False);
             Assert.That(score.parent.name, Is.EqualTo("Canvas"));
-            Assert.That(plaque.type, Is.EqualTo(Image.Type.Simple));
+            Assert.That(plaque.type, Is.EqualTo(Image.Type.Sliced));
             Assert.That(plaque.preserveAspect, Is.True);
             Assert.That(plaque.raycastTarget, Is.False);
             Assert.That(background, Is.Not.Null);
@@ -245,16 +246,19 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             }
         }
 
-        private static void AssertScoreAnchoring(RectTransform score, TMP_Text scoreText)
+        private static void AssertScoreAnchoring(RectTransform score, TMP_Text label, TMP_Text value)
         {
             Assert.That(score.parent.name, Is.EqualTo("Canvas"));
             Assert.That(score.anchorMin, Is.EqualTo(new Vector2(0.5f, 0.9f)));
             Assert.That(score.anchorMax, Is.EqualTo(new Vector2(0.5f, 0.9f)));
             Assert.That(score.pivot, Is.EqualTo(new Vector2(0.5f, 0.5f)));
             Assert.That(score.anchoredPosition, Is.EqualTo(Vector2.zero));
-            StringAssert.Contains("SCORE", scoreText.text);
-            Assert.That(scoreText.font, Is.Not.Null);
-            Assert.That(scoreText.font.atlasPopulationMode, Is.EqualTo(AtlasPopulationMode.Dynamic));
+            Assert.That(score.sizeDelta, Is.EqualTo(new Vector2(420.0f, 140.0f)));
+            Assert.That(label.text, Is.EqualTo("SCORE"));
+            Assert.That(label.font, Is.Not.Null);
+            Assert.That(label.font.atlasPopulationMode, Is.EqualTo(AtlasPopulationMode.Dynamic));
+            Assert.That(value.text, Is.EqualTo("0"));
+            Assert.That(value.font, Is.EqualTo(label.font));
         }
 
         private static void AssertPresentationProfile(

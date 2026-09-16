@@ -126,7 +126,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         {
             GameObject scoreObject = GameObject.Find("Score");
             Assert.That(scoreObject, Is.Not.Null, "The score display was not found in the Gameplay UI.");
-            TMP_Text scoreText = scoreObject.transform.Find("ScoreText").GetComponent<TMP_Text>();
+            TMP_Text scoreText = scoreObject.transform.Find("Value").GetComponent<TMP_Text>();
             Assert.That(scoreText, Is.Not.Null);
             return scoreText;
         }
