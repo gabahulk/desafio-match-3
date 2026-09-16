@@ -20,14 +20,15 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 {
                     TMP_Text scoreText = FindScoreText();
                     Assert.That(controller.Score, Is.Zero);
-                    Assert.That(scoreText.text, Is.EqualTo("0"));
+                    StringAssert.Contains("SCORE", scoreText.text);
+                    StringAssert.Contains("0", scoreText.text);
                     Assert.That(scoreText.gameObject.activeInHierarchy, Is.True);
                 },
                 controller =>
                 {
                     TMP_Text scoreText = FindScoreText();
                     Assert.That(controller.Score, Is.GreaterThan(0));
-                    Assert.That(scoreText.text, Is.EqualTo(controller.Score.ToString("N0", CultureInfo.InvariantCulture)));
+                    StringAssert.Contains(controller.Score.ToString("N0", CultureInfo.InvariantCulture), scoreText.text);
                 });
         }
 
