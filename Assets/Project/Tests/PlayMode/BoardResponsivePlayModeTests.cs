@@ -66,7 +66,10 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 AssertCanvasConfiguration(canvasScaler);
 
                 RectTransform canvasRect = (RectTransform)canvas.transform;
-                RectTransform boardOffset = (RectTransform)GameObject.Find("BoardOffset").transform;
+                RectTransform boardFrame = (RectTransform)GameObject.Find("BoardFrame").transform;
+                RectTransform boardSafeArea = (RectTransform)GameObject.Find("BoardSafeArea").transform;
+                Image boardFrameImage = boardFrame.GetComponent<Image>();
+                Image background = GameObject.Find("Background").GetComponent<Image>();
                 BoardResponsiveController responsiveController =
                     UnityEngine.Object.FindFirstObjectByType<BoardResponsiveController>();
                 RectTransform boardContainer = responsiveController.GetComponent<RectTransform>();
@@ -76,7 +79,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 TileSpotView[] tileSpots = UnityEngine.Object.FindObjectsByType<TileSpotView>(
                     FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
-                AssertBoardOffsetMargins(boardOffset);
+                AssertBoardFrameHierarchy(boardFrame, boardSafeArea, boardFrameImage, background);
                 Assert.That(aspectRatioFitter.aspectMode,
                     Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent));
                 Assert.That(tileSpots, Has.Length.EqualTo(boardSize.x * boardSize.y));
@@ -100,7 +103,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                     AssertLayout(
                         viewport,
                         boardSize,
-                        boardOffset,
+                        boardSafeArea,
                         boardContainer,
                         aspectRatioFitter,
                         gridLayoutGroup,
@@ -129,18 +132,29 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(canvasScaler.matchWidthOrHeight, Is.EqualTo(0.5f));
         }
 
-        private static void AssertBoardOffsetMargins(RectTransform boardOffset)
+        private static void AssertBoardFrameHierarchy(
+            RectTransform boardFrame,
+            RectTransform boardSafeArea,
+            Image boardFrameImage,
+            Image background)
         {
-            Assert.That(boardOffset.anchorMin, Is.EqualTo(Vector2.zero));
-            Assert.That(boardOffset.anchorMax, Is.EqualTo(Vector2.one));
-            Assert.That(boardOffset.sizeDelta, Is.EqualTo(new Vector2(-40, -70)));
-            Assert.That(boardOffset.anchoredPosition, Is.EqualTo(new Vector2(0, -15)));
+            Assert.That(boardFrame.parent.name, Is.EqualTo("Canvas"));
+            Assert.That(boardSafeArea.parent, Is.EqualTo(boardFrame));
+            Assert.That(boardSafeArea.anchorMin.x, Is.InRange(0.05f, 0.08f));
+            Assert.That(boardSafeArea.anchorMin.y, Is.InRange(0.05f, 0.08f));
+            Assert.That(boardSafeArea.anchorMax.x, Is.InRange(0.92f, 0.95f));
+            Assert.That(boardSafeArea.anchorMax.y, Is.InRange(0.92f, 0.95f));
+            Assert.That(boardFrameImage, Is.Not.Null);
+            Assert.That(boardFrameImage.raycastTarget, Is.False);
+            Assert.That(background, Is.Not.Null);
+            Assert.That(background.sprite, Is.Not.Null);
+            Assert.That(background.raycastTarget, Is.False);
         }
 
         private static void AssertLayout(
             Vector2Int viewport,
             Vector2Int boardSize,
-            RectTransform boardOffset,
+            RectTransform boardSafeArea,
             RectTransform boardContainer,
             AspectRatioFitter aspectRatioFitter,
             GridLayoutGroup gridLayoutGroup,
@@ -166,15 +180,15 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 Is.EqualTo(expectedCellSize).Within(0.05f), caseName);
 
             Assert.That(boardContainer.rect.width,
-                Is.LessThanOrEqualTo(boardOffset.rect.width + 0.05f), caseName);
+                Is.LessThanOrEqualTo(boardSafeArea.rect.width + 0.05f), caseName);
             Assert.That(boardContainer.rect.height,
-                Is.LessThanOrEqualTo(boardOffset.rect.height + 0.05f), caseName);
+                Is.LessThanOrEqualTo(boardSafeArea.rect.height + 0.05f), caseName);
             Assert.That(gridLayoutGroup.cellSize.x * boardSize.x,
                 Is.LessThanOrEqualTo(boardContainer.rect.width + 0.05f), caseName);
             Assert.That(gridLayoutGroup.cellSize.y * boardSize.y,
                 Is.LessThanOrEqualTo(boardContainer.rect.height + 0.05f), caseName);
 
-            Vector3 offsetCenter = boardOffset.TransformPoint(boardOffset.rect.center);
+            Vector3 offsetCenter = boardSafeArea.TransformPoint(boardSafeArea.rect.center);
             Vector3 boardCenter = boardContainer.TransformPoint(boardContainer.rect.center);
             Assert.That(Vector3.Distance(offsetCenter, boardCenter), Is.LessThan(0.05f), caseName);
 
