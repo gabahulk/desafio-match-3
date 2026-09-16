@@ -151,7 +151,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 556466931}
+  m_Father: {fileID: 556466921}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -188,21 +188,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AspectMode: 3
   m_AspectRatio: 1
---- !u!114 &429446046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 429446041}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b63b699db59f4d3f85d643c435e3504c, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  _boardContainer: {fileID: 429446042}
-  _aspectRatioFitter: {fileID: 429446044}
-  _gridLayoutGroup: {fileID: 429446045}
 --- !u!114 &429446045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -227,6 +212,21 @@ MonoBehaviour:
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 1
   m_ConstraintCount: 10
+--- !u!114 &429446046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 429446041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b63b699db59f4d3f85d643c435e3504c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  _boardContainer: {fileID: 429446042}
+  _aspectRatioFitter: {fileID: 429446044}
+  _gridLayoutGroup: {fileID: 429446045}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -398,6 +398,7 @@ GameObject:
   - component: {fileID: 556466921}
   - component: {fileID: 556466922}
   - component: {fileID: 556466923}
+  - component: {fileID: 556466924}
   m_Layer: 5
   m_Name: BoardFrame
   m_TagString: Untagged
@@ -417,13 +418,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 556466931}
+  - {fileID: 429446042}
   m_Father: {fileID: 1122489957}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -15}
-  m_SizeDelta: {x: -40, y: -70}
+  m_AnchorMin: {x: 0.05, y: 0.1}
+  m_AnchorMax: {x: 0.95, y: 0.9}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &556466922
 CanvasRenderer:
@@ -453,8 +454,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 4afd2a7c4c37f3a41a15032fba7e8657, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -463,42 +464,29 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1 &556466930
-GameObject:
+--- !u!114 &556466924
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 556466931}
-  m_Layer: 5
-  m_Name: BoardSafeArea
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &556466931
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 556466930}
-  m_LocalRotation: {x: -0, y: -0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 429446042}
-  m_Father: {fileID: 556466921}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.065, y: 0.065}
-  m_AnchorMax: {x: 0.935, y: 0.935}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_GameObject: {fileID: 556466920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34437a6d1e8049a49d8aeeb51dd719e1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  _canvasRect: {fileID: 1122489957}
+  _boardFrame: {fileID: 556466921}
+  _backgroundImage: {fileID: 1122489963}
+  _portraitLayout:
+    _anchorMin: {x: 0.05, y: 0.1}
+    _anchorMax: {x: 0.95, y: 0.9}
+    _background: {fileID: -4364034832326165938, guid: d7fda71d95000474998b00787f78675f, type: 3}
+  _landscapeLayout:
+    _anchorMin: {x: 0.16, y: 0.1}
+    _anchorMax: {x: 0.84, y: 0.9}
+    _background: {fileID: -4364034832326165938, guid: d7fda71d95000474998b00787f78675f, type: 3}
 --- !u!1 &1122489952
 GameObject:
   m_ObjectHideFlags: 0

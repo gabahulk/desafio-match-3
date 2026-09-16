@@ -18,7 +18,9 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         private static readonly Vector2Int[] ViewportSizes =
         {
             new(1080, 1920),
+            new(720, 1600),
             new(1920, 1080),
+            new(2560, 1080),
             new(2048, 1539)
         };
 
@@ -67,9 +69,10 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
 
                 RectTransform canvasRect = (RectTransform)canvas.transform;
                 RectTransform boardFrame = (RectTransform)GameObject.Find("BoardFrame").transform;
-                RectTransform boardSafeArea = (RectTransform)GameObject.Find("BoardSafeArea").transform;
                 Image boardFrameImage = boardFrame.GetComponent<Image>();
                 Image background = GameObject.Find("Background").GetComponent<Image>();
+                BoardFrameResponsiveController frameResponsiveController =
+                    boardFrame.GetComponent<BoardFrameResponsiveController>();
                 BoardResponsiveController responsiveController =
                     UnityEngine.Object.FindFirstObjectByType<BoardResponsiveController>();
                 RectTransform boardContainer = responsiveController.GetComponent<RectTransform>();
@@ -79,7 +82,11 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 TileSpotView[] tileSpots = UnityEngine.Object.FindObjectsByType<TileSpotView>(
                     FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
-                AssertBoardFrameHierarchy(boardFrame, boardSafeArea, boardFrameImage, background);
+                AssertBoardFrameHierarchy(
+                    boardFrame,
+                    boardFrameImage,
+                    background,
+                    frameResponsiveController);
                 Assert.That(aspectRatioFitter.aspectMode,
                     Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent));
                 Assert.That(tileSpots, Has.Length.EqualTo(boardSize.x * boardSize.y));
@@ -89,7 +96,6 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 canvasScaler.enabled = false;
                 canvasRect.localScale = Vector3.one;
 
-                float? previousCellSize = null;
                 for (int viewportIndex = 0; viewportIndex < ViewportSizes.Length; viewportIndex++)
                 {
                     Vector2Int viewport = ViewportSizes[viewportIndex];
@@ -103,20 +109,12 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                     AssertLayout(
                         viewport,
                         boardSize,
-                        boardSafeArea,
+                        boardFrame,
                         boardContainer,
                         aspectRatioFitter,
                         gridLayoutGroup,
                         tileSpots);
 
-                    if (previousCellSize.HasValue)
-                    {
-                        Assert.That(gridLayoutGroup.cellSize.x,
-                            Is.Not.EqualTo(previousCellSize.Value).Within(0.01f),
-                            "Changing the viewport must recalculate the grid without recreating it.");
-                    }
-
-                    previousCellSize = gridLayoutGroup.cellSize.x;
                     AssertInteractionCoordinates(boardView, tileSpots, boardSize);
                 }
             }
@@ -134,27 +132,26 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
 
         private static void AssertBoardFrameHierarchy(
             RectTransform boardFrame,
-            RectTransform boardSafeArea,
             Image boardFrameImage,
-            Image background)
+            Image background,
+            BoardFrameResponsiveController frameResponsiveController)
         {
             Assert.That(boardFrame.parent.name, Is.EqualTo("Canvas"));
-            Assert.That(boardSafeArea.parent, Is.EqualTo(boardFrame));
-            Assert.That(boardSafeArea.anchorMin.x, Is.InRange(0.05f, 0.08f));
-            Assert.That(boardSafeArea.anchorMin.y, Is.InRange(0.05f, 0.08f));
-            Assert.That(boardSafeArea.anchorMax.x, Is.InRange(0.92f, 0.95f));
-            Assert.That(boardSafeArea.anchorMax.y, Is.InRange(0.92f, 0.95f));
             Assert.That(boardFrameImage, Is.Not.Null);
+            Assert.That(boardFrameImage.type, Is.EqualTo(Image.Type.Sliced));
+            Assert.That(boardFrameImage.sprite, Is.Not.Null);
+            Assert.That(boardFrameImage.sprite.border, Is.EqualTo(new Vector4(150, 150, 150, 150)));
             Assert.That(boardFrameImage.raycastTarget, Is.False);
             Assert.That(background, Is.Not.Null);
             Assert.That(background.sprite, Is.Not.Null);
             Assert.That(background.raycastTarget, Is.False);
+            Assert.That(frameResponsiveController, Is.Not.Null);
         }
 
         private static void AssertLayout(
             Vector2Int viewport,
             Vector2Int boardSize,
-            RectTransform boardSafeArea,
+            RectTransform boardFrame,
             RectTransform boardContainer,
             AspectRatioFitter aspectRatioFitter,
             GridLayoutGroup gridLayoutGroup,
@@ -179,16 +176,18 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(gridLayoutGroup.cellSize.x,
                 Is.EqualTo(expectedCellSize).Within(0.05f), caseName);
 
+            AssertPresentationProfile(viewport, boardFrame, caseName);
+
             Assert.That(boardContainer.rect.width,
-                Is.LessThanOrEqualTo(boardSafeArea.rect.width + 0.05f), caseName);
+                Is.LessThanOrEqualTo(boardFrame.rect.width + 0.05f), caseName);
             Assert.That(boardContainer.rect.height,
-                Is.LessThanOrEqualTo(boardSafeArea.rect.height + 0.05f), caseName);
+                Is.LessThanOrEqualTo(boardFrame.rect.height + 0.05f), caseName);
             Assert.That(gridLayoutGroup.cellSize.x * boardSize.x,
                 Is.LessThanOrEqualTo(boardContainer.rect.width + 0.05f), caseName);
             Assert.That(gridLayoutGroup.cellSize.y * boardSize.y,
                 Is.LessThanOrEqualTo(boardContainer.rect.height + 0.05f), caseName);
 
-            Vector3 offsetCenter = boardSafeArea.TransformPoint(boardSafeArea.rect.center);
+            Vector3 offsetCenter = boardFrame.TransformPoint(boardFrame.rect.center);
             Vector3 boardCenter = boardContainer.TransformPoint(boardContainer.rect.center);
             Assert.That(Vector3.Distance(offsetCenter, boardCenter), Is.LessThan(0.05f), caseName);
 
@@ -200,6 +199,21 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 Assert.That(tileRect.rect.width,
                     Is.EqualTo(expectedCellSize).Within(0.05f), caseName);
             }
+        }
+
+        private static void AssertPresentationProfile(
+            Vector2Int viewport,
+            RectTransform boardFrame,
+            string caseName)
+        {
+            bool isPortrait = viewport.y > viewport.x;
+            Vector2 expectedMin = isPortrait ? new Vector2(0.05f, 0.1f) : new Vector2(0.16f, 0.1f);
+            Vector2 expectedMax = isPortrait ? new Vector2(0.95f, 0.9f) : new Vector2(0.84f, 0.9f);
+
+            Assert.That(boardFrame.anchorMin, Is.EqualTo(expectedMin), caseName);
+            Assert.That(boardFrame.anchorMax, Is.EqualTo(expectedMax), caseName);
+            Assert.That(boardFrame.offsetMin, Is.EqualTo(Vector2.zero), caseName);
+            Assert.That(boardFrame.offsetMax, Is.EqualTo(Vector2.zero), caseName);
         }
 
         private static void AssertTileCoordinates(
