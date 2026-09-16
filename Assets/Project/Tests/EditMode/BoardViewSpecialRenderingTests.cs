@@ -21,7 +21,12 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             try
             {
+                RectTransform rootRect = root.GetComponent<RectTransform>();
+                rootRect.sizeDelta = new Vector2(400, 100);
                 GridLayoutGroup grid = root.AddComponent<GridLayoutGroup>();
+                AspectRatioFitter aspectRatioFitter = root.AddComponent<AspectRatioFitter>();
+                BoardResponsiveController responsiveController =
+                    root.AddComponent<BoardResponsiveController>();
                 BoardView boardView = root.AddComponent<BoardView>();
                 TileSpotView tileSpot = tileSpotObject.AddComponent<TileSpotView>();
 
@@ -31,8 +36,16 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 prefabs.GetArrayElementAtIndex(0).objectReferenceValue = tilePrefab;
                 repositoryData.ApplyModifiedPropertiesWithoutUndo();
 
+                SerializedObject responsiveData = new(responsiveController);
+                responsiveData.FindProperty("_boardContainer").objectReferenceValue = rootRect;
+                responsiveData.FindProperty("_aspectRatioFitter").objectReferenceValue = aspectRatioFitter;
+                responsiveData.FindProperty("_gridLayoutGroup").objectReferenceValue = grid;
+                responsiveData.ApplyModifiedPropertiesWithoutUndo();
+
                 SerializedObject boardViewData = new(boardView);
                 boardViewData.FindProperty("_boardContainer").objectReferenceValue = grid;
+                boardViewData.FindProperty("_responsiveController").objectReferenceValue =
+                    responsiveController;
                 boardViewData.FindProperty("_tilePrefabRepository").objectReferenceValue = repository;
                 boardViewData.FindProperty("_tileSpotPrefab").objectReferenceValue = tileSpot;
                 boardViewData.ApplyModifiedPropertiesWithoutUndo();

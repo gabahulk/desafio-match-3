@@ -13,6 +13,7 @@ namespace Gazeus.DesafioMatch3.Views
         public event Action<int, int> TileClicked;
 
         [SerializeField] private GridLayoutGroup _boardContainer;
+        [SerializeField] private BoardResponsiveController _responsiveController;
         [SerializeField] private TilePrefabRepository _tilePrefabRepository;
         [SerializeField] private TileSpotView _tileSpotPrefab;
 
@@ -21,7 +22,7 @@ namespace Gazeus.DesafioMatch3.Views
 
         public void CreateBoard(Board board)
         {
-            _boardContainer.constraintCount = board.Width;
+            _responsiveController.SetBoardSize(board.Width, board.Height);
             _tiles = new GameObject[board.Height][];
             _tileSpots = new TileSpotView[board.Height][];
 
