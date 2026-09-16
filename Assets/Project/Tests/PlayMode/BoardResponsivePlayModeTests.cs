@@ -161,6 +161,8 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(boardRegion.parent.name, Is.EqualTo("Canvas"));
             Assert.That(boardFrame.parent, Is.EqualTo(boardRegion));
             Assert.That(boardContent.parent, Is.EqualTo(boardFrame));
+            Assert.That(boardContent.GetComponent<RectMask2D>(), Is.Not.Null);
+            Assert.That(boardFrame.GetComponent<RectMask2D>(), Is.Null);
             Assert.That(boardFrameImage, Is.Not.Null);
             Assert.That(boardFrameImage.type, Is.EqualTo(Image.Type.Sliced));
             Assert.That(boardFrameImage.sprite, Is.Not.Null);
