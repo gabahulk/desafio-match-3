@@ -19,6 +19,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         {
             new(1080, 1920),
             new(720, 1600),
+            new(1080, 2340),
             new(1920, 1080),
             new(2560, 1080),
             new(2048, 1539)
@@ -68,22 +69,27 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 AssertCanvasConfiguration(canvasScaler);
 
                 RectTransform canvasRect = (RectTransform)canvas.transform;
+                RectTransform boardRegion = (RectTransform)GameObject.Find("BoardRegion").transform;
                 RectTransform boardFrame = (RectTransform)GameObject.Find("BoardFrame").transform;
+                RectTransform boardContent = (RectTransform)GameObject.Find("BoardContent").transform;
                 Image boardFrameImage = boardFrame.GetComponent<Image>();
                 Image background = GameObject.Find("Background").GetComponent<Image>();
                 BoardFrameResponsiveController frameResponsiveController =
-                    boardFrame.GetComponent<BoardFrameResponsiveController>();
+                    boardRegion.GetComponent<BoardFrameResponsiveController>();
                 BoardResponsiveController responsiveController =
                     UnityEngine.Object.FindFirstObjectByType<BoardResponsiveController>();
                 RectTransform boardContainer = responsiveController.GetComponent<RectTransform>();
                 AspectRatioFitter aspectRatioFitter = responsiveController.GetComponent<AspectRatioFitter>();
+                AspectRatioFitter frameAspectRatioFitter = boardFrame.GetComponent<AspectRatioFitter>();
                 GridLayoutGroup gridLayoutGroup = responsiveController.GetComponent<GridLayoutGroup>();
                 BoardView boardView = responsiveController.GetComponent<BoardView>();
                 TileSpotView[] tileSpots = UnityEngine.Object.FindObjectsByType<TileSpotView>(
                     FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
                 AssertBoardFrameHierarchy(
+                    boardRegion,
                     boardFrame,
+                    boardContent,
                     boardFrameImage,
                     background,
                     frameResponsiveController);
@@ -109,11 +115,15 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                     AssertLayout(
                         viewport,
                         boardSize,
+                        boardRegion,
                         boardFrame,
+                        boardContent,
                         boardContainer,
                         aspectRatioFitter,
+                        frameAspectRatioFitter,
                         gridLayoutGroup,
-                        tileSpots);
+                        tileSpots,
+                        background);
 
                     AssertInteractionCoordinates(boardView, tileSpots, boardSize);
                 }
@@ -131,12 +141,16 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         }
 
         private static void AssertBoardFrameHierarchy(
+            RectTransform boardRegion,
             RectTransform boardFrame,
+            RectTransform boardContent,
             Image boardFrameImage,
             Image background,
             BoardFrameResponsiveController frameResponsiveController)
         {
-            Assert.That(boardFrame.parent.name, Is.EqualTo("Canvas"));
+            Assert.That(boardRegion.parent.name, Is.EqualTo("Canvas"));
+            Assert.That(boardFrame.parent, Is.EqualTo(boardRegion));
+            Assert.That(boardContent.parent, Is.EqualTo(boardFrame));
             Assert.That(boardFrameImage, Is.Not.Null);
             Assert.That(boardFrameImage.type, Is.EqualTo(Image.Type.Sliced));
             Assert.That(boardFrameImage.sprite, Is.Not.Null);
@@ -151,11 +165,15 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
         private static void AssertLayout(
             Vector2Int viewport,
             Vector2Int boardSize,
+            RectTransform boardRegion,
             RectTransform boardFrame,
+            RectTransform boardContent,
             RectTransform boardContainer,
             AspectRatioFitter aspectRatioFitter,
+            AspectRatioFitter frameAspectRatioFitter,
             GridLayoutGroup gridLayoutGroup,
-            IReadOnlyList<TileSpotView> tileSpots)
+            IReadOnlyList<TileSpotView> tileSpots,
+            Image background)
         {
             string caseName = $"viewport {viewport.x}x{viewport.y}, board {boardSize.x}x{boardSize.y}";
             float expectedAspectRatio = (float)boardSize.x / boardSize.y;
@@ -165,6 +183,12 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 boardContainer.rect.height / boardSize.y);
 
             Assert.That(aspectRatioFitter.aspectRatio,
+                Is.EqualTo(expectedAspectRatio).Within(0.001f), caseName);
+            Assert.That(frameAspectRatioFitter.aspectMode,
+                Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent), caseName);
+            Assert.That(frameAspectRatioFitter.aspectRatio,
+                Is.EqualTo(expectedAspectRatio).Within(0.001f), caseName);
+            Assert.That(boardFrame.rect.width / boardFrame.rect.height,
                 Is.EqualTo(expectedAspectRatio).Within(0.001f), caseName);
             Assert.That(actualAspectRatio,
                 Is.EqualTo(expectedAspectRatio).Within(0.001f), caseName);
@@ -176,12 +200,19 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(gridLayoutGroup.cellSize.x,
                 Is.EqualTo(expectedCellSize).Within(0.05f), caseName);
 
-            AssertPresentationProfile(viewport, boardFrame, caseName);
+            AssertPresentationProfile(viewport, boardRegion, background, caseName);
+
+            Assert.That(boardFrame.rect.width,
+                Is.LessThanOrEqualTo(boardRegion.rect.width + 0.05f), caseName);
+            Assert.That(boardFrame.rect.height,
+                Is.LessThanOrEqualTo(boardRegion.rect.height + 0.05f), caseName);
+            Assert.That(boardContent.offsetMin, Is.EqualTo(new Vector2(80, 80)), caseName);
+            Assert.That(boardContent.offsetMax, Is.EqualTo(new Vector2(-80, -80)), caseName);
 
             Assert.That(boardContainer.rect.width,
-                Is.LessThanOrEqualTo(boardFrame.rect.width + 0.05f), caseName);
+                Is.LessThanOrEqualTo(boardContent.rect.width + 0.05f), caseName);
             Assert.That(boardContainer.rect.height,
-                Is.LessThanOrEqualTo(boardFrame.rect.height + 0.05f), caseName);
+                Is.LessThanOrEqualTo(boardContent.rect.height + 0.05f), caseName);
             Assert.That(gridLayoutGroup.cellSize.x * boardSize.x,
                 Is.LessThanOrEqualTo(boardContainer.rect.width + 0.05f), caseName);
             Assert.That(gridLayoutGroup.cellSize.y * boardSize.y,
@@ -203,17 +234,19 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
 
         private static void AssertPresentationProfile(
             Vector2Int viewport,
-            RectTransform boardFrame,
+            RectTransform boardRegion,
+            Image background,
             string caseName)
         {
             bool isPortrait = viewport.y > viewport.x;
-            Vector2 expectedMin = isPortrait ? new Vector2(0.05f, 0.1f) : new Vector2(0.16f, 0.1f);
-            Vector2 expectedMax = isPortrait ? new Vector2(0.95f, 0.9f) : new Vector2(0.84f, 0.9f);
+            Vector2 expectedMin = isPortrait ? new Vector2(0, 0.17f) : new Vector2(0.17f, 0.05f);
+            Vector2 expectedMax = isPortrait ? new Vector2(1, 0.83f) : new Vector2(0.84f, 0.95f);
 
-            Assert.That(boardFrame.anchorMin, Is.EqualTo(expectedMin), caseName);
-            Assert.That(boardFrame.anchorMax, Is.EqualTo(expectedMax), caseName);
-            Assert.That(boardFrame.offsetMin, Is.EqualTo(Vector2.zero), caseName);
-            Assert.That(boardFrame.offsetMax, Is.EqualTo(Vector2.zero), caseName);
+            Assert.That(boardRegion.anchorMin, Is.EqualTo(expectedMin), caseName);
+            Assert.That(boardRegion.anchorMax, Is.EqualTo(expectedMax), caseName);
+            Assert.That(boardRegion.offsetMin, Is.EqualTo(Vector2.zero), caseName);
+            Assert.That(boardRegion.offsetMax, Is.EqualTo(Vector2.zero), caseName);
+            Assert.That(background.sprite.name, Is.EqualTo(isPortrait ? "bg-portrait" : "bg"), caseName);
         }
 
         private static void AssertTileCoordinates(

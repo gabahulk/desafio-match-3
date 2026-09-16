@@ -9,6 +9,7 @@ namespace Gazeus.DesafioMatch3.Views
     {
         [SerializeField] private RectTransform _boardContainer;
         [SerializeField] private AspectRatioFitter _aspectRatioFitter;
+        [SerializeField] private AspectRatioFitter _boardFrameAspectRatioFitter;
         [SerializeField] private GridLayoutGroup _gridLayoutGroup;
 
         private int _boardWidth;
@@ -29,11 +30,19 @@ namespace Gazeus.DesafioMatch3.Views
             _boardWidth = width;
             _boardHeight = height;
 
-            _aspectRatioFitter.aspectRatio = (float)width / height;
+            float aspectRatio = (float)width / height;
+            _aspectRatioFitter.aspectRatio = aspectRatio;
+            if (_boardFrameAspectRatioFitter != null)
+            {
+                _boardFrameAspectRatioFitter.aspectRatio = aspectRatio;
+            }
+
             _gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             _gridLayoutGroup.constraintCount = width;
 
-            RectTransform layoutRoot = _boardContainer.parent as RectTransform;
+            RectTransform layoutRoot = _boardFrameAspectRatioFitter != null
+                ? _boardFrameAspectRatioFitter.transform.parent as RectTransform
+                : _boardContainer.parent as RectTransform;
             LayoutRebuilder.ForceRebuildLayoutImmediate(layoutRoot ?? _boardContainer);
             RecalculateCellSize();
         }

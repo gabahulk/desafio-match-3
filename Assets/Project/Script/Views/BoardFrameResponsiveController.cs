@@ -19,7 +19,7 @@ namespace Gazeus.DesafioMatch3.Views
         }
 
         [SerializeField] private RectTransform _canvasRect;
-        [SerializeField] private RectTransform _boardFrame;
+        [SerializeField] private RectTransform _boardRegion;
         [SerializeField] private Image _backgroundImage;
         [SerializeField] private LayoutProfile _portraitLayout;
         [SerializeField] private LayoutProfile _landscapeLayout;
@@ -38,7 +38,7 @@ namespace Gazeus.DesafioMatch3.Views
 
         private void ApplyCurrentProfile(bool force)
         {
-            if (_canvasRect == null || _boardFrame == null || _backgroundImage == null)
+            if (_canvasRect == null || _boardRegion == null || _backgroundImage == null)
             {
                 return;
             }
@@ -51,10 +51,10 @@ namespace Gazeus.DesafioMatch3.Views
 
             _isPortrait = isPortrait;
             LayoutProfile profile = isPortrait ? _portraitLayout : _landscapeLayout;
-            _boardFrame.anchorMin = profile.AnchorMin;
-            _boardFrame.anchorMax = profile.AnchorMax;
-            _boardFrame.offsetMin = Vector2.zero;
-            _boardFrame.offsetMax = Vector2.zero;
+            _boardRegion.anchorMin = profile.AnchorMin;
+            _boardRegion.anchorMax = profile.AnchorMax;
+            _boardRegion.offsetMin = Vector2.zero;
+            _boardRegion.offsetMax = Vector2.zero;
             _backgroundImage.sprite = profile.Background;
         }
     }
