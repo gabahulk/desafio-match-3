@@ -69,8 +69,9 @@ namespace Gazeus.DesafioMatch3.Views
 
                 _tiles[position.y][position.x] = tile;
 
-                tile.transform.localScale = Vector2.zero;
-                sequence.Join(tile.transform.DOScale(1.0f, 0.2f));
+                tile.transform.DOKill();
+                tile.transform.localScale = Vector3.one * 0.75f;
+                sequence.Join(tile.transform.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack));
             }
 
             return sequence;
@@ -93,19 +94,38 @@ namespace Gazeus.DesafioMatch3.Views
                 SpecialTileInfo specialTile = specialTiles[index];
                 GameObject tile = _tiles[specialTile.Position.y][specialTile.Position.x];
                 ApplyTileVisual(tile, specialTile.Color, specialTile.Special);
+
+                if (tile != null)
+                {
+                    tile.transform.DOKill();
+                    tile.transform.DOPunchScale(Vector3.one * 0.14f, 0.18f, 4);
+                }
             }
         }
 
         public Tween DestroyTiles(List<Vector2Int> matchedPositions)
         {
+            Sequence sequence = DOTween.Sequence();
             for (int i = 0; i < matchedPositions.Count; i++)
             {
                 Vector2Int position = matchedPositions[i];
-                Destroy(_tiles[position.y][position.x]);
+                GameObject tile = _tiles[position.y][position.x];
+                if (tile != null)
+                {
+                    tile.transform.DOKill();
+                    tile.transform.localScale = Vector3.one;
+
+                    Sequence destruction = DOTween.Sequence()
+                        .Append(tile.transform.DOScale(Vector3.one * 1.12f, 0.08f).SetEase(Ease.OutQuad))
+                        .Append(tile.transform.DOScale(Vector3.zero, 0.12f).SetEase(Ease.InBack))
+                        .OnComplete(() => Destroy(tile));
+                    sequence.Join(destruction);
+                }
+
                 _tiles[position.y][position.x] = null;
             }
 
-            return DOVirtual.DelayedCall(0.2f, () => { });
+            return sequence;
         }
 
         public Tween PlaySpecialActivations(List<SpecialActivationInfo> activations)
@@ -122,6 +142,7 @@ namespace Gazeus.DesafioMatch3.Views
                 GameObject tile = _tiles[activation.Position.y][activation.Position.x];
                 if (tile != null)
                 {
+                    tile.transform.DOKill();
                     sequence.Join(tile.transform.DOPunchScale(Vector3.one * 0.2f, 0.2f, 4));
                 }
             }
