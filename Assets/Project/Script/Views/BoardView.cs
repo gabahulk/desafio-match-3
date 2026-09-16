@@ -56,6 +56,7 @@ namespace Gazeus.DesafioMatch3.Views
         public Tween CreateTile(List<AddedTileInfo> addedTiles)
         {
             Sequence sequence = DOTween.Sequence();
+            Dictionary<int, int> spawnedTilesPerColumn = new();
             for (int i = 0; i < addedTiles.Count; i++)
             {
                 AddedTileInfo addedTileInfo = addedTiles[i];
@@ -70,8 +71,16 @@ namespace Gazeus.DesafioMatch3.Views
                 _tiles[position.y][position.x] = tile;
 
                 tile.transform.DOKill();
-                tile.transform.localScale = Vector3.one * 0.75f;
-                sequence.Join(tile.transform.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack));
+                tile.transform.localScale = Vector3.one;
+
+                int spawnIndex = spawnedTilesPerColumn.GetValueOrDefault(position.x);
+                spawnedTilesPerColumn[position.x] = spawnIndex + 1;
+                tile.transform.position = GetRefillSpawnPosition(tileSpot, spawnIndex);
+
+                Sequence spawn = DOTween.Sequence()
+                    .Append(tile.transform.DOMove(tileSpot.transform.position, 0.3f).SetEase(Ease.InQuad))
+                    .Append(tile.transform.DOPunchScale(Vector3.one * 0.06f, 0.12f, 4));
+                sequence.Join(spawn);
             }
 
             return sequence;
@@ -116,8 +125,9 @@ namespace Gazeus.DesafioMatch3.Views
                     tile.transform.localScale = Vector3.one;
 
                     Sequence destruction = DOTween.Sequence()
-                        .Append(tile.transform.DOScale(Vector3.one * 1.12f, 0.08f).SetEase(Ease.OutQuad))
-                        .Append(tile.transform.DOScale(Vector3.zero, 0.12f).SetEase(Ease.InBack))
+                        .Join(tile.transform.DOPunchScale(Vector3.one * 0.1f, 0.1f, 4))
+                        .Join(tile.transform.DOShakeRotation(0.1f, new Vector3(0.0f, 0.0f, 3.0f), 10))
+                        .Append(tile.transform.DOScale(Vector3.zero, 0.1f).SetEase(Ease.InBack))
                         .OnComplete(() => Destroy(tile));
                     sequence.Join(destruction);
                 }
@@ -178,6 +188,19 @@ namespace Gazeus.DesafioMatch3.Views
             _tiles = tiles;
 
             return sequence;
+        }
+
+        private Vector3 GetRefillSpawnPosition(TileSpotView tileSpot, int spawnIndex)
+        {
+            RectTransform boardRect = (RectTransform)_boardContainer.transform;
+            Vector3[] boardCorners = new Vector3[4];
+            boardRect.GetWorldCorners(boardCorners);
+
+            RectTransform tileSpotRect = (RectTransform)tileSpot.transform;
+            float tileHeight = tileSpotRect.TransformVector(Vector3.up * tileSpotRect.rect.height).magnitude;
+            float spawnY = boardCorners[1].y + (Mathf.Max(tileHeight, 1.0f) * (spawnIndex + 1));
+            Vector3 destination = tileSpot.transform.position;
+            return new Vector3(destination.x, spawnY, destination.z);
         }
 
         public Tween SwapTiles(int fromX, int fromY, int toX, int toY)
