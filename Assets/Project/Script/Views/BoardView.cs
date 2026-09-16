@@ -95,11 +95,11 @@ namespace Gazeus.DesafioMatch3.Views
             }
         }
 
-        public Tween DestroyTiles(List<Vector2Int> matchedPosition)
+        public Tween DestroyTiles(List<Vector2Int> matchedPositions)
         {
-            for (int i = 0; i < matchedPosition.Count; i++)
+            for (int i = 0; i < matchedPositions.Count; i++)
             {
-                Vector2Int position = matchedPosition[i];
+                Vector2Int position = matchedPositions[i];
                 Destroy(_tiles[position.y][position.x]);
                 _tiles[position.y][position.x] = null;
             }

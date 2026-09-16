@@ -49,7 +49,9 @@ namespace Gazeus.DesafioMatch3.Core
 
         public MoveResult TrySwap(int fromX, int fromY, int toX, int toY)
         {
-            if (Math.Abs(fromX - toX) + Math.Abs(fromY - toY) != 1)
+            if (!IsWithinBoard(fromX, fromY) ||
+                !IsWithinBoard(toX, toY) ||
+                Math.Abs(fromX - toX) + Math.Abs(fromY - toY) != 1)
             {
                 return new MoveResult(false, Array.Empty<BoardSequence>());
             }
@@ -76,6 +78,11 @@ namespace Gazeus.DesafioMatch3.Core
             _board = candidateBoard;
 
             return new MoveResult(true, boardSequences);
+        }
+
+        private bool IsWithinBoard(int x, int y)
+        {
+            return x >= 0 && x < _board.Width && y >= 0 && y < _board.Height;
         }
 
         private List<BoardSequence> Resolve(
@@ -159,7 +166,7 @@ namespace Gazeus.DesafioMatch3.Core
                     });
                 }
 
-                List<Vector2Int> matchedPosition = new(destructionCells.Count);
+                List<Vector2Int> matchedPositions = new(destructionCells.Count);
                 for (int y = 0; y < board.Height; y++)
                 {
                     for (int x = 0; x < board.Width; x++)
@@ -167,7 +174,7 @@ namespace Gazeus.DesafioMatch3.Core
                         Vector2Int position = new(x, y);
                         if (destructionCells.Contains(position))
                         {
-                            matchedPosition.Add(position);
+                            matchedPositions.Add(position);
                             board[x, y] = new Tile
                             {
                                 Id = -1,
@@ -181,10 +188,10 @@ namespace Gazeus.DesafioMatch3.Core
                 // Dropping the tiles
                 Dictionary<int, MovedTileInfo> movedTiles = new();
                 List<MovedTileInfo> movedTilesList = new();
-                for (int i = 0; i < matchedPosition.Count; i++)
+                for (int i = 0; i < matchedPositions.Count; i++)
                 {
-                    int x = matchedPosition[i].x;
-                    int y = matchedPosition[i].y;
+                    int x = matchedPositions[i].x;
+                    int y = matchedPositions[i].y;
                     if (y > 0)
                     {
                         for (int j = y; j > 0; j--)
@@ -244,7 +251,7 @@ namespace Gazeus.DesafioMatch3.Core
 
                 BoardSequence sequence = new()
                 {
-                    MatchedPosition = matchedPosition,
+                    MatchedPositions = matchedPositions,
                     MovedTiles = movedTilesList,
                     AddedTiles = addedTiles,
                     CreatedSpecialTiles = createdSpecialTiles,

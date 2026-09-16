@@ -5,13 +5,13 @@ using Gazeus.DesafioMatch3.Core;
 using Gazeus.DesafioMatch3.Models;
 using Gazeus.DesafioMatch3.Views;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Gazeus.DesafioMatch3.Controllers
 {
     public class GameController : MonoBehaviour
     {
         [SerializeField] private BoardView _boardView;
+        [SerializeField] private ScoreView _scoreView;
         [SerializeField] private int _boardHeight = 10;
         [SerializeField] private int _boardWidth = 10;
 
@@ -20,7 +20,6 @@ namespace Gazeus.DesafioMatch3.Controllers
         private bool _hasStarted;
         private int _selectedX = -1;
         private int _selectedY = -1;
-        private Text _scoreText;
 
         public Board Board => _gameService?.Board;
         public bool IsAnimating => _isAnimating;
@@ -31,7 +30,6 @@ namespace Gazeus.DesafioMatch3.Controllers
         {
             _gameService ??= new GameService();
             _boardView.TileClicked += OnTileClick;
-            CreateScoreDisplay();
         }
 
         private void OnDestroy()
@@ -68,39 +66,9 @@ namespace Gazeus.DesafioMatch3.Controllers
             _boardView.CreateBoard(board);
         }
 
-        private void CreateScoreDisplay()
-        {
-            Canvas canvas = FindFirstObjectByType<Canvas>();
-            if (canvas == null)
-            {
-                return;
-            }
-
-            GameObject scoreObject = new("Score", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-            scoreObject.transform.SetParent(canvas.transform, false);
-
-            RectTransform rectTransform = scoreObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = new Vector2(0.5f, 1.0f);
-            rectTransform.anchorMax = new Vector2(0.5f, 1.0f);
-            rectTransform.pivot = new Vector2(0.5f, 1.0f);
-            rectTransform.anchoredPosition = new Vector2(0.0f, -8.0f);
-            rectTransform.sizeDelta = new Vector2(240.0f, 64.0f);
-
-            _scoreText = scoreObject.GetComponent<Text>();
-            _scoreText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            _scoreText.fontSize = 24;
-            _scoreText.alignment = TextAnchor.MiddleCenter;
-            _scoreText.color = Color.white;
-            _scoreText.raycastTarget = false;
-            UpdateScore(0);
-        }
-
         private void UpdateScore(int score)
         {
-            if (_scoreText != null)
-            {
-                _scoreText.text = $"SCORE\n{score}";
-            }
+            _scoreView.UpdateScore(score);
         }
 
         private void AnimateBoard(IReadOnlyList<BoardSequence> boardSequences, int index, Action onComplete)
@@ -110,7 +78,7 @@ namespace Gazeus.DesafioMatch3.Controllers
             Sequence sequence = DOTween.Sequence();
             _boardView.ApplySpecialTransformations(boardSequence.TransformedSpecialTiles);
             sequence.Append(_boardView.PlaySpecialActivations(boardSequence.SpecialActivations));
-            sequence.Append(_boardView.DestroyTiles(boardSequence.MatchedPosition));
+            sequence.Append(_boardView.DestroyTiles(boardSequence.MatchedPositions));
             _boardView.ApplyCreatedSpecials(boardSequence.CreatedSpecialTiles);
             sequence.Append(_boardView.MoveTiles(boardSequence.MovedTiles));
             sequence.Append(_boardView.CreateTile(boardSequence.AddedTiles));

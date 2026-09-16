@@ -89,6 +89,31 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Assert.That(service.Score, Is.EqualTo(scoreBeforeInvalidSwap));
         }
 
+        [TestCase(-1, 0, 0, 0)]
+        [TestCase(0, -1, 0, 0)]
+        [TestCase(3, 0, 4, 0)]
+        [TestCase(0, 3, 0, 4)]
+        public void TrySwap_WhenPositionIsOutsideBoard_ReturnsInvalidWithoutChangingState(
+            int fromX,
+            int fromY,
+            int toX,
+            int toY)
+        {
+            var service = new GameService(BoardFixture.Create(
+                "RGBY",
+                "GBYR",
+                "BYRG",
+                "RRGR"), new[] { 0, 1, 2, 3 });
+            Board boardBeforeSwap = service.Board.Clone();
+
+            MoveResult result = service.TrySwap(fromX, fromY, toX, toY);
+
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.BoardSequences, Is.Empty);
+            AssertBoardsHaveEqualTiles(service.Board, boardBeforeSwap);
+            Assert.That(service.Score, Is.Zero);
+        }
+
         private static MoveResult TrySwapDeterministically(
             GameService service,
             int fromX,

@@ -17,7 +17,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             MoveResult result = TrySwapDeterministically(service, 2, 3, 3, 3);
 
-            Assert.That(result.BoardSequences[0].MatchedPosition, Has.Count.EqualTo(3));
+            Assert.That(result.BoardSequences[0].MatchedPositions, Has.Count.EqualTo(3));
             Assert.That(result.BoardSequences[0].ScoreGained, Is.EqualTo(30));
             Assert.That(result.BoardSequences[0].TotalScore, Is.EqualTo(30));
         }
@@ -31,7 +31,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             MoveResult result = TrySwapDeterministically(service, 4, 4, 5, 4);
 
-            Assert.That(result.BoardSequences[0].MatchedPosition, Has.Count.EqualTo(9));
+            Assert.That(result.BoardSequences[0].MatchedPositions, Has.Count.EqualTo(9));
             Assert.That(result.BoardSequences[0].ScoreGained, Is.EqualTo(90));
         }
 
@@ -45,7 +45,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             MoveResult result = TrySwapDeterministically(service, 4, 4, 5, 4);
 
-            Assert.That(result.BoardSequences[0].MatchedPosition, Has.Count.EqualTo(17));
+            Assert.That(result.BoardSequences[0].MatchedPositions, Has.Count.EqualTo(17));
             Assert.That(result.BoardSequences[0].ScoreGained, Is.EqualTo(170));
         }
 
@@ -62,7 +62,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             BoardSequence first = result.BoardSequences[0];
             Assert.That(first.SpecialActivations.Any(info =>
                 info.Special == SpecialType.VerticalStriped), Is.True);
-            Assert.That(first.MatchedPosition, Has.Count.EqualTo(17));
+            Assert.That(first.MatchedPositions, Has.Count.EqualTo(17));
             Assert.That(first.ScoreGained, Is.EqualTo(170));
         }
 
@@ -75,9 +75,9 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             Assert.That(result.BoardSequences, Has.Count.EqualTo(2));
             Assert.That(result.BoardSequences[0].ScoreGained,
-                Is.EqualTo(result.BoardSequences[0].MatchedPosition.Count * 10));
+                Is.EqualTo(result.BoardSequences[0].MatchedPositions.Count * 10));
             Assert.That(result.BoardSequences[1].ScoreGained,
-                Is.EqualTo(result.BoardSequences[1].MatchedPosition.Count * 10 * 2));
+                Is.EqualTo(result.BoardSequences[1].MatchedPositions.Count * 10 * 2));
             Assert.That(result.BoardSequences[1].TotalScore,
                 Is.EqualTo(result.BoardSequences.Sum(sequence => sequence.ScoreGained)));
             Assert.That(service.Score, Is.EqualTo(result.BoardSequences[1].TotalScore));
@@ -96,8 +96,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             BoardSequence second = result.BoardSequences[1];
             Assert.That(first.SpecialActivations.Single().Phase, Is.EqualTo(SpecialActivationPhase.First));
             Assert.That(second.SpecialActivations.Single().Phase, Is.EqualTo(SpecialActivationPhase.Second));
-            Assert.That(first.ScoreGained, Is.EqualTo(first.MatchedPosition.Count * 10));
-            Assert.That(second.ScoreGained, Is.EqualTo(second.MatchedPosition.Count * 10));
+            Assert.That(first.ScoreGained, Is.EqualTo(first.MatchedPositions.Count * 10));
+            Assert.That(second.ScoreGained, Is.EqualTo(second.MatchedPositions.Count * 10));
             Assert.That(second.TotalScore, Is.EqualTo(first.ScoreGained + second.ScoreGained));
         }
 

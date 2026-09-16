@@ -95,8 +95,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
             MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
 
             BoardSequence first = result.BoardSequences[0];
-            Assert.That(first.MatchedPosition, Does.Contain(new Vector2Int(1, 0)));
-            Assert.That(first.MatchedPosition, Does.Contain(new Vector2Int(0, 0)));
+            Assert.That(first.MatchedPositions, Does.Contain(new Vector2Int(1, 0)));
+            Assert.That(first.MatchedPositions, Does.Contain(new Vector2Int(0, 0)));
             Assert.That(first.SpecialActivations, Has.Count.EqualTo(1));
             SpecialActivationInfo activation = first.SpecialActivations[0];
             Assert.That(activation.Special, Is.EqualTo(SpecialType.ColorBomb));
@@ -125,7 +125,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
 
             MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
 
-            Assert.That(result.BoardSequences[0].MatchedPosition,
+            Assert.That(result.BoardSequences[0].MatchedPositions,
                 Does.Contain(new Vector2Int(4, 2)));
             Assert.That(result.BoardSequences[0].SpecialActivations.Any(info =>
                 info.Special == SpecialType.HorizontalStriped && info.Position == new Vector2Int(2, 2)), Is.True);
@@ -156,7 +156,11 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
             MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
 
             Assert.That(result.BoardSequences[0].SpecialActivations, Has.Count.EqualTo(1));
-            Assert.That(result.BoardSequences[0].SpecialActivations[0].CombinedWith,
+            SpecialActivationInfo activation = result.BoardSequences[0].SpecialActivations[0];
+            Assert.That(activation.Special, Is.EqualTo(SpecialType.Wrapped));
+            Assert.That(activation.Position, Is.EqualTo(new Vector2Int(0, 0)));
+            Assert.That(activation.PartnerPosition, Is.EqualTo(new Vector2Int(1, 0)));
+            Assert.That(activation.CombinedWith,
                 Is.EqualTo(SpecialType.HorizontalStriped));
         }
 
@@ -186,7 +190,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
             MoveResult result = TrySwapDeterministically(service, 0, 0, 1, 0);
 
             BoardSequence first = result.BoardSequences[0];
-            Assert.That(first.MatchedPosition, Has.Count.EqualTo(board.Width * board.Height));
+            Assert.That(first.MatchedPositions, Has.Count.EqualTo(board.Width * board.Height));
             Assert.That(first.SpecialActivations.Count(info => info.Special == SpecialType.ColorBomb), Is.EqualTo(2));
         }
 
@@ -244,7 +248,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode.SpecialEffects
             SpecialType partnerSpecial = first == SpecialType.ColorBomb ? second : first;
             Assert.That(result.BoardSequences.SelectMany(sequence => sequence.SpecialActivations).Count(info =>
                 info.Special == partnerSpecial && info.Phase == SpecialActivationPhase.First), Is.EqualTo(1));
-            Assert.That(result.BoardSequences[0].MatchedPosition,
+            Assert.That(result.BoardSequences[0].MatchedPositions,
                 Does.Contain(partnerSpecial == SpecialType.HorizontalStriped
                     ? new Vector2Int(4, 0)
                     : new Vector2Int(partnerXAfterSwap == 0 ? 1 : 0, 1)));

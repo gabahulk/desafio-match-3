@@ -29,7 +29,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(3, 3),
                 0,
                 SpecialType.HorizontalStriped);
-            Assert.That(sequence.MatchedPosition, Is.EqualTo(new[]
+            Assert.That(sequence.MatchedPositions, Is.EqualTo(new[]
             {
                 new Vector2Int(0, 3),
                 new Vector2Int(1, 3),
@@ -58,7 +58,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(0, 3),
                 0,
                 SpecialType.VerticalStriped);
-            Assert.That(sequence.MatchedPosition, Is.EqualTo(new[]
+            Assert.That(sequence.MatchedPositions, Is.EqualTo(new[]
             {
                 new Vector2Int(0, 0),
                 new Vector2Int(0, 1),
@@ -84,7 +84,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 new Vector2Int(0, 0),
                 0,
                 SpecialType.HorizontalStriped);
-            Assert.That(result.BoardSequences[0].MatchedPosition, Has.None.EqualTo(new Vector2Int(0, 0)));
+            Assert.That(result.BoardSequences[0].MatchedPositions, Has.None.EqualTo(new Vector2Int(0, 0)));
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             Assert.That(sequence.CreatedSpecialTiles, Has.Count.EqualTo(1));
             Assert.That(sequence.CreatedSpecialTiles[0].Special, Is.EqualTo(SpecialType.ColorBomb));
             Assert.That(sequence.CreatedSpecialTiles[0].Color, Is.EqualTo(-1));
-            Assert.That(sequence.MatchedPosition, Has.Count.EqualTo(4));
+            Assert.That(sequence.MatchedPositions, Has.Count.EqualTo(4));
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             MoveResult result = TrySwapDeterministically(service, 0, 2, 1, 2);
 
-            Assert.That(result.BoardSequences[0].MatchedPosition, Is.EqualTo(new[]
+            Assert.That(result.BoardSequences[0].MatchedPositions, Is.EqualTo(new[]
             {
                 new Vector2Int(0, 2),
                 new Vector2Int(1, 2),
@@ -162,7 +162,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             MoveResult result = TrySwapDeterministically(service, 0, 0, 0, 1);
 
-            Assert.That(result.BoardSequences[0].MatchedPosition, Is.EqualTo(new[]
+            Assert.That(result.BoardSequences[0].MatchedPositions, Is.EqualTo(new[]
             {
                 new Vector2Int(0, 0),
                 new Vector2Int(0, 1),
@@ -188,7 +188,7 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
 
             MoveResult result = TrySwapDeterministically(service, 0, 2, 1, 2);
 
-            List<Vector2Int> matched = result.BoardSequences[0].MatchedPosition;
+            List<Vector2Int> matched = result.BoardSequences[0].MatchedPositions;
             Assert.That(matched, Has.Count.EqualTo(9));
             Assert.That(matched.Distinct().Count(), Is.EqualTo(9));
             Assert.That(matched, Is.EqualTo(new[]
@@ -224,8 +224,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 Is.EqualTo(2));
             Assert.That(sequence.CreatedSpecialTiles[0].Position, Is.EqualTo(new Vector2Int(1, 0)));
             Assert.That(sequence.CreatedSpecialTiles[1].Position, Is.EqualTo(new Vector2Int(0, 2)));
-            Assert.That(sequence.MatchedPosition, Has.None.EqualTo(sequence.CreatedSpecialTiles[0].Position));
-            Assert.That(sequence.MatchedPosition, Has.None.EqualTo(sequence.CreatedSpecialTiles[1].Position));
+            Assert.That(sequence.MatchedPositions, Has.None.EqualTo(sequence.CreatedSpecialTiles[0].Position));
+            Assert.That(sequence.MatchedPositions, Has.None.EqualTo(sequence.CreatedSpecialTiles[1].Position));
         }
 
         [Test]
@@ -274,9 +274,9 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 SpecialType.HorizontalStriped);
             Assert.That(cascade.MovedTiles.Any(move => move.To == new Vector2Int(2, 3)), Is.False);
             Assert.That(result.BoardSequences[0].MovedTiles.Any(move => move.To == new Vector2Int(2, 3)), Is.True);
-            Assert.That(cascade.MatchedPosition, Has.None.EqualTo(new Vector2Int(2, 3)));
-            Assert.That(cascade.MatchedPosition, Has.None.EqualTo(new Vector2Int(4, 3)));
-            Assert.That(cascade.MatchedPosition, Has.None.EqualTo(new Vector2Int(5, 3)));
+            Assert.That(cascade.MatchedPositions, Has.None.EqualTo(new Vector2Int(2, 3)));
+            Assert.That(cascade.MatchedPositions, Has.None.EqualTo(new Vector2Int(4, 3)));
+            Assert.That(cascade.MatchedPositions, Has.None.EqualTo(new Vector2Int(5, 3)));
         }
 
         [Test]
@@ -302,8 +302,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
                 0,
                 SpecialType.VerticalStriped);
             Assert.That(result.BoardSequences[0].MovedTiles.Any(move => move.To == new Vector2Int(3, 1)), Is.True);
-            Assert.That(cascade.MatchedPosition, Has.None.EqualTo(new Vector2Int(3, 1)));
-            Assert.That(cascade.MatchedPosition, Has.None.EqualTo(new Vector2Int(3, 5)));
+            Assert.That(cascade.MatchedPositions, Has.None.EqualTo(new Vector2Int(3, 1)));
+            Assert.That(cascade.MatchedPositions, Has.None.EqualTo(new Vector2Int(3, 5)));
         }
 
         private static MoveResult TrySwapDeterministically(

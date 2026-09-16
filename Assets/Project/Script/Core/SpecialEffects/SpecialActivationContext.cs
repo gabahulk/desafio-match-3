@@ -9,6 +9,7 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
         internal SpecialType Special { get; }
         internal SpecialType? CombinedWith { get; }
         internal Vector2Int? PartnerPosition { get; }
+        internal Vector2Int EffectCenter { get; }
         internal SpecialActivationPhase Phase { get; }
         internal int? TargetColor { get; set; }
 
@@ -18,7 +19,8 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
             int? targetColor = null,
             SpecialType? special = null,
             SpecialType? combinedWith = null,
-            Vector2Int? partnerPosition = null)
+            Vector2Int? partnerPosition = null,
+            Vector2Int? effectCenter = null)
         {
             Position = position;
             Phase = phase;
@@ -26,6 +28,7 @@ namespace Gazeus.DesafioMatch3.Core.SpecialEffects
             Special = special ?? SpecialType.None;
             CombinedWith = combinedWith;
             PartnerPosition = partnerPosition;
+            EffectCenter = effectCenter ?? position;
         }
     }
 }

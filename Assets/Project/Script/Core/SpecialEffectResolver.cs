@@ -23,8 +23,7 @@ namespace Gazeus.DesafioMatch3.Core
         internal static SpecialEffectResolution Expand(
             Board board,
             HashSet<Vector2Int> initialCells,
-            IReadOnlyCollection<Vector2Int> protectedCells,
-            IReadOnlyList<SpecialActivationInfo> initialActivations = null)
+            IReadOnlyCollection<Vector2Int> protectedCells)
         {
             HashSet<Vector2Int> destructionCells = new(initialCells);
             Queue<SpecialActivationContext> specialsToActivate = new();
@@ -44,7 +43,7 @@ namespace Gazeus.DesafioMatch3.Core
             }
 
             return ExpandQueued(board, destructionCells, protectedCells,
-                specialsToActivate, queuedSpecials, initialActivations);
+                specialsToActivate, queuedSpecials);
         }
 
         internal static SpecialEffectResolution ResolvePending(
@@ -69,7 +68,7 @@ namespace Gazeus.DesafioMatch3.Core
             }
 
             return ExpandQueued(board, destructionCells, new HashSet<Vector2Int>(),
-                specialsToActivate, queuedSpecials, null);
+                specialsToActivate, queuedSpecials);
         }
 
         internal static IReadOnlyList<SpecialActivationContext> CreateSpecialMatchActivations(
@@ -80,7 +79,6 @@ namespace Gazeus.DesafioMatch3.Core
             Tile second = board[specialMatch.SecondPosition.x, specialMatch.SecondPosition.y];
             List<SpecialActivationContext> contexts = new();
 
-            Vector2Int center = specialMatch.SecondPosition;
             if (first.Special == SpecialType.ColorBomb && second.Special == SpecialType.None ||
                 second.Special == SpecialType.ColorBomb && first.Special == SpecialType.None)
             {
@@ -91,28 +89,27 @@ namespace Gazeus.DesafioMatch3.Core
                 return contexts;
             }
 
-            SpecialType primary = first.Special == SpecialType.ColorBomb || second.Special == SpecialType.ColorBomb
-                ? SpecialType.ColorBomb
-                : first.Special;
-            SpecialType partnerType = primary == first.Special ? second.Special : first.Special;
-            int? targetColor = primary == SpecialType.ColorBomb && partnerType != SpecialType.ColorBomb
-                ? (first.Special == SpecialType.ColorBomb ? second.Color : first.Color)
+            bool firstIsPrimary = first.Special == SpecialType.ColorBomb ||
+                                  second.Special != SpecialType.ColorBomb;
+            Tile primary = firstIsPrimary ? first : second;
+            Tile partner = firstIsPrimary ? second : first;
+            Vector2Int primaryPosition = firstIsPrimary
+                ? specialMatch.FirstPosition
+                : specialMatch.SecondPosition;
+            Vector2Int partnerPosition = firstIsPrimary
+                ? specialMatch.SecondPosition
+                : specialMatch.FirstPosition;
+            SpecialType primaryType = primary.Special;
+            SpecialType partnerType = partner.Special;
+            int? targetColor = primaryType == SpecialType.ColorBomb && partnerType != SpecialType.ColorBomb
+                ? partner.Color
                 : null;
-            Vector2Int activationPosition = center;
-            Vector2Int partnerPosition = specialMatch.FirstPosition;
-            if (primary == SpecialType.ColorBomb)
-            {
-                bool firstIsBomb = first.Special == SpecialType.ColorBomb;
-                activationPosition = firstIsBomb
-                    ? specialMatch.FirstPosition
-                    : specialMatch.SecondPosition;
-                partnerPosition = firstIsBomb
-                    ? specialMatch.SecondPosition
-                    : specialMatch.FirstPosition;
-            }
 
-            contexts.Add(new SpecialActivationContext(activationPosition, SpecialActivationPhase.First, targetColor,
-                special: primary, combinedWith: partnerType, partnerPosition: partnerPosition));
+            contexts.Add(new SpecialActivationContext(primaryPosition, SpecialActivationPhase.First, targetColor,
+                special: primaryType,
+                combinedWith: partnerType,
+                partnerPosition: partnerPosition,
+                effectCenter: specialMatch.SecondPosition));
             return contexts;
         }
 
@@ -141,7 +138,7 @@ namespace Gazeus.DesafioMatch3.Core
             }
 
             return ExpandQueued(board, new HashSet<Vector2Int>(), new HashSet<Vector2Int>(),
-                specialsToActivate, queuedSpecials, null);
+                specialsToActivate, queuedSpecials);
         }
 
         private static SpecialEffectResolution ExpandQueued(
@@ -149,13 +146,10 @@ namespace Gazeus.DesafioMatch3.Core
             HashSet<Vector2Int> destructionCells,
             IReadOnlyCollection<Vector2Int> protectedCells,
             Queue<SpecialActivationContext> specialsToActivate,
-            HashSet<Vector2Int> queuedSpecials,
-            IReadOnlyList<SpecialActivationInfo> initialActivations)
+            HashSet<Vector2Int> queuedSpecials)
         {
             List<PendingSpecialActivation> pendingActivations = new();
-            List<SpecialActivationInfo> activations = initialActivations != null
-                ? new List<SpecialActivationInfo>(initialActivations)
-                : new List<SpecialActivationInfo>();
+            List<SpecialActivationInfo> activations = new();
             List<SpecialTransformation> transformations = new();
             HashSet<Vector2Int> preservedSourceCells = new();
             HashSet<Vector2Int> activatedSpecials = new();

@@ -185,8 +185,8 @@ namespace Gazeus.DesafioMatch3.Tests.EditMode
             params Vector2Int[] expectedPositions)
         {
             Assert.That(sequences, Is.Not.Empty);
-            Assert.That(sequences[0].MatchedPosition, Has.Count.EqualTo(expectedPositions.Length));
-            Assert.That(sequences[0].MatchedPosition, Is.EquivalentTo(expectedPositions));
+            Assert.That(sequences[0].MatchedPositions, Has.Count.EqualTo(expectedPositions.Length));
+            Assert.That(sequences[0].MatchedPositions, Is.EquivalentTo(expectedPositions));
         }
     }
 }
