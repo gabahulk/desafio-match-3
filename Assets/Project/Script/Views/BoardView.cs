@@ -138,6 +138,18 @@ namespace Gazeus.DesafioMatch3.Views
             return sequence;
         }
 
+        public Vector3 GetMatchCenter(IReadOnlyList<Vector2Int> matchedPositions)
+        {
+            Vector3 center = Vector3.zero;
+            for (int index = 0; index < matchedPositions.Count; index++)
+            {
+                Vector2Int position = matchedPositions[index];
+                center += _tileSpots[position.y][position.x].transform.position;
+            }
+
+            return center / matchedPositions.Count;
+        }
+
         public Tween PlaySpecialActivations(List<SpecialActivationInfo> activations)
         {
             Sequence sequence = DOTween.Sequence();

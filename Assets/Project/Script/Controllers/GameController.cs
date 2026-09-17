@@ -78,6 +78,7 @@ namespace Gazeus.DesafioMatch3.Controllers
             Sequence sequence = DOTween.Sequence();
             _boardView.ApplySpecialTransformations(boardSequence.TransformedSpecialTiles);
             sequence.Append(_boardView.PlaySpecialActivations(boardSequence.SpecialActivations));
+            sequence.AppendCallback(() => TriggerScoreFeedback(boardSequence));
             sequence.Append(_boardView.DestroyTiles(boardSequence.MatchedPositions));
             _boardView.ApplyCreatedSpecials(boardSequence.CreatedSpecialTiles);
             sequence.Append(_boardView.MoveTiles(boardSequence.MovedTiles));
@@ -86,7 +87,6 @@ namespace Gazeus.DesafioMatch3.Controllers
             int nextIndex = index + 1;
             sequence.onComplete += () =>
             {
-                UpdateScore(boardSequence.TotalScore);
                 if (nextIndex < boardSequences.Count)
                 {
                     AnimateBoard(boardSequences, nextIndex, onComplete);
@@ -96,6 +96,21 @@ namespace Gazeus.DesafioMatch3.Controllers
                     onComplete();
                 }
             };
+        }
+
+        private void TriggerScoreFeedback(BoardSequence boardSequence)
+        {
+            if (boardSequence.ScoreGained > 0)
+            {
+                _scoreView.ShowScoreFeedback(
+                    boardSequence.ScoreGained,
+                    boardSequence.TotalScore,
+                    _boardView.GetMatchCenter(boardSequence.MatchedPositions));
+            }
+            else
+            {
+                UpdateScore(boardSequence.TotalScore);
+            }
         }
 
         private void OnTileClick(int x, int y)
