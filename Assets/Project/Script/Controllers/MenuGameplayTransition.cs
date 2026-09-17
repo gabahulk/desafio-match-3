@@ -96,22 +96,9 @@ namespace Gazeus.DesafioMatch3.Controllers
             _overlay.color = new Color(0.07f, 0.03f, 0.16f, 0.0f);
             _overlay.raycastTarget = true;
 
-            Image menuJokerImage = menuJoker.GetComponent<Image>();
-            _joker = CreateImage("Joker", root).rectTransform;
-            Image jokerImage = _joker.GetComponent<Image>();
-            jokerImage.sprite = menuJokerImage.sprite;
-            jokerImage.preserveAspect = true;
-            jokerImage.raycastTarget = false;
-            _joker.sizeDelta = menuJoker.rect.size;
-            _joker.localScale = menuJoker.localScale;
-            _joker.localRotation = menuJoker.localRotation;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                root,
-                RectTransformUtility.WorldToScreenPoint(null, menuJoker.position),
-                null,
-                out Vector2 localPosition);
-            _joker.anchoredPosition = localPosition;
-            menuJokerImage.enabled = false;
+            _joker = menuJoker;
+            _joker.SetParent(root, true);
+            _joker.GetComponent<Image>().raycastTarget = false;
         }
 
         private static Image CreateImage(string objectName, RectTransform parent)

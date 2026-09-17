@@ -59,7 +59,10 @@ namespace Gazeus.DesafioMatch3.Controllers
             _introSequence?.Kill();
             _jokerIdleTween?.Kill();
             _playIdleTween?.Kill();
-            _joker.DOKill();
+            if (!_isTransitioning)
+            {
+                _joker.DOKill();
+            }
             _playButtonTransform.DOKill();
             _title.DOKill();
             _playButton.onClick.RemoveListener(Play);
