@@ -73,6 +73,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                 RectTransform boardRegion = (RectTransform)GameObject.Find("BoardRegion").transform;
                 RectTransform boardFrame = (RectTransform)GameObject.Find("BoardFrame").transform;
                 RectTransform boardContent = (RectTransform)GameObject.Find("BoardContent").transform;
+                RectTransform boardVfxOverlay = (RectTransform)GameObject.Find("BoardVFXOverlay").transform;
                 RectTransform score = (RectTransform)GameObject.Find("Score").transform;
                 Image boardFrameImage = boardFrame.GetComponent<Image>();
                 Image plaque = score.Find("Plaque").GetComponent<Image>();
@@ -95,6 +96,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
                     boardRegion,
                     boardFrame,
                     boardContent,
+                    boardVfxOverlay,
                     boardFrameImage,
                     score,
                     plaque,
@@ -152,6 +154,7 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             RectTransform boardRegion,
             RectTransform boardFrame,
             RectTransform boardContent,
+            RectTransform boardVfxOverlay,
             Image boardFrameImage,
             RectTransform score,
             Image plaque,
@@ -161,8 +164,11 @@ namespace Gazeus.DesafioMatch3.Tests.PlayMode
             Assert.That(boardRegion.parent.name, Is.EqualTo("Canvas"));
             Assert.That(boardFrame.parent, Is.EqualTo(boardRegion));
             Assert.That(boardContent.parent, Is.EqualTo(boardFrame));
+            Assert.That(boardVfxOverlay.parent, Is.EqualTo(boardFrame));
             Assert.That(boardContent.GetComponent<RectMask2D>(), Is.Not.Null);
             Assert.That(boardFrame.GetComponent<RectMask2D>(), Is.Null);
+            Assert.That(boardVfxOverlay.GetComponent<RectMask2D>(), Is.Null);
+            Assert.That(boardVfxOverlay.GetComponent<BoardVfxView>(), Is.Not.Null);
             Assert.That(boardFrameImage, Is.Not.Null);
             Assert.That(boardFrameImage.type, Is.EqualTo(Image.Type.Sliced));
             Assert.That(boardFrameImage.sprite, Is.Not.Null);

@@ -16,6 +16,7 @@ namespace Gazeus.DesafioMatch3.Views
         [SerializeField] private BoardResponsiveController _responsiveController;
         [SerializeField] private TileVisualRepository _tileVisualRepository;
         [SerializeField] private TileSpotView _tileSpotPrefab;
+        [SerializeField] private BoardVfxView _boardVfxView;
 
         private GameObject[][] _tiles;
         private TileSpotView[][] _tileSpots;
@@ -156,13 +157,18 @@ namespace Gazeus.DesafioMatch3.Views
             for (int index = 0; index < activations.Count; index++)
             {
                 SpecialActivationInfo activation = activations[index];
-                if (activation.Special != SpecialType.ColorBomb)
+                Vector2Int position = activation.Position;
+                GameObject tile = _tiles[position.y][position.x];
+                TileSpotView tileSpot = _tileSpots[position.y][position.x];
+                if (_boardVfxView != null)
                 {
-                    continue;
+                    sequence.Join(_boardVfxView.Play(
+                        activation,
+                        tileSpot.transform.position,
+                        GetTileSize(tileSpot),
+                        tile));
                 }
-
-                GameObject tile = _tiles[activation.Position.y][activation.Position.x];
-                if (tile != null)
+                else if (activation.Special == SpecialType.ColorBomb && tile != null)
                 {
                     tile.transform.DOKill();
                     sequence.Join(tile.transform.DOPunchScale(Vector3.one * 0.2f, 0.2f, 4));
@@ -170,6 +176,11 @@ namespace Gazeus.DesafioMatch3.Views
             }
 
             return sequence;
+        }
+
+        private static float GetTileSize(TileSpotView tileSpot)
+        {
+            return ((RectTransform)tileSpot.transform).rect.width;
         }
 
         public Tween MoveTiles(List<MovedTileInfo> movedTiles)
