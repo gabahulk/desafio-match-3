@@ -35,6 +35,9 @@ namespace Gazeus.DesafioMatch3.Controllers
         [SerializeField] private RectTransform[] _suits;
         [SerializeField] private RectTransform _joker;
         [SerializeField] private RectTransform _playButton;
+        [SerializeField] private UnityEngine.UI.Image _background;
+        [SerializeField] private Sprite _portraitBackground;
+        [SerializeField] private Sprite _landscapeBackground;
         [SerializeField] private LayoutProfile _portraitLayout;
         [SerializeField] private LayoutProfile _landscapeLayout;
 
@@ -59,7 +62,8 @@ namespace Gazeus.DesafioMatch3.Controllers
 
         private void ApplyCurrentProfile(bool force)
         {
-            if (_canvas == null || _title == null || _suitGroup == null || _joker == null || _playButton == null)
+            if (_canvas == null || _title == null || _suitGroup == null || _joker == null || _playButton == null ||
+                _background == null)
             {
                 return;
             }
@@ -72,6 +76,10 @@ namespace Gazeus.DesafioMatch3.Controllers
 
             _isPortrait = isPortrait;
             LayoutProfile profile = isPortrait ? _portraitLayout : _landscapeLayout;
+            _background.sprite = isPortrait ? _portraitBackground : _landscapeBackground;
+            _background.type = UnityEngine.UI.Image.Type.Simple;
+            _background.preserveAspect = false;
+            _background.raycastTarget = false;
             _title.anchoredPosition = profile.TitlePosition;
             _title.localScale = Vector3.one * profile.TitleScale;
             _suitGroup.anchoredPosition = profile.SuitGroupPosition;

@@ -29,9 +29,19 @@ namespace Gazeus.DesafioMatch3.Controllers
         private bool _isTransitioning;
         private bool _hasStarted;
         private Sequence _introSequence;
+        private Tween _jokerIdleTween;
+        private Tween _playIdleTween;
 
         private void Awake()
         {
+            for (int index = 0; index < _suits.Length; index++)
+            {
+                Image image = _suits[index].GetComponent<Image>();
+                image.type = Image.Type.Simple;
+                image.preserveAspect = true;
+                image.raycastTarget = false;
+            }
+
             _playButton.interactable = false;
             _playButton.onClick.AddListener(Play);
             _responsiveController.LayoutChanged += OnLayoutChanged;
@@ -46,6 +56,12 @@ namespace Gazeus.DesafioMatch3.Controllers
 
         private void OnDestroy()
         {
+            _introSequence?.Kill();
+            _jokerIdleTween?.Kill();
+            _playIdleTween?.Kill();
+            _joker.DOKill();
+            _playButtonTransform.DOKill();
+            _title.DOKill();
             _playButton.onClick.RemoveListener(Play);
             _responsiveController.LayoutChanged -= OnLayoutChanged;
         }
@@ -60,6 +76,8 @@ namespace Gazeus.DesafioMatch3.Controllers
             _isTransitioning = true;
             _playButton.interactable = false;
             _introSequence?.Kill();
+            _jokerIdleTween?.Kill();
+            _playIdleTween?.Kill();
             _joker.DOKill();
             _playButtonTransform.DOKill();
             _title.DOKill();
@@ -89,7 +107,7 @@ namespace Gazeus.DesafioMatch3.Controllers
                 RectTransform suit = _suits[index];
                 suitFinalPositions[index] = suit.anchoredPosition;
                 Vector2 direction = _suitEntryDirections[index];
-                suit.anchoredPosition += Vector2.Scale(direction, canvasSize * 0.5f);
+                suit.anchoredPosition += Vector2.Scale(direction, canvasSize * 0.22f);
                 suit.localScale = Vector3.one * 0.9f;
                 suit.localRotation = Quaternion.Euler(0.0f, 0.0f, direction.x * 14.0f);
             }
@@ -106,8 +124,7 @@ namespace Gazeus.DesafioMatch3.Controllers
 
             Vector2 playFinalPosition = _playButtonTransform.anchoredPosition;
             Vector3 playFinalScale = _playButtonTransform.localScale;
-            _playButtonTransform.anchoredPosition += Vector2.down * canvasSize.y * 0.16f;
-            _playButtonTransform.localScale = playFinalScale * 0.9f;
+            _playButtonTransform.localScale = playFinalScale * 0.96f;
             _playButtonCanvasGroup.alpha = 0.0f;
 
             _introSequence = DOTween.Sequence();
@@ -136,28 +153,22 @@ namespace Gazeus.DesafioMatch3.Controllers
             _introSequence.Insert(0.36f, _title.DOScale(titleFinalScale, 0.24f).SetEase(Ease.OutQuad));
             _introSequence.Insert(0.36f, Fade(_titleCanvasGroup, 1.0f, 0.24f));
 
-            _introSequence.Insert(0.6f, DOTween.To(() => _playButtonTransform.anchoredPosition,
-                position => _playButtonTransform.anchoredPosition = position, playFinalPosition, 0.3f)
-                .SetEase(Ease.OutBack));
-            _introSequence.Insert(0.6f, _playButtonTransform.DOScale(playFinalScale, 0.3f).SetEase(Ease.OutBack));
-            _introSequence.Insert(0.6f, Fade(_playButtonCanvasGroup, 1.0f, 0.2f));
-            _introSequence.OnComplete(() => BeginIdle(playFinalPosition, jokerFinalPosition));
+            _introSequence.Insert(0.6f, _playButtonTransform.DOScale(playFinalScale, 0.22f).SetEase(Ease.OutQuad));
+            _introSequence.Insert(0.6f, Fade(_playButtonCanvasGroup, 1.0f, 0.22f));
+            _introSequence.OnComplete(() => BeginIdle(jokerFinalPosition, playFinalScale));
         }
 
-        private void BeginIdle(Vector2 playPosition, Vector2 jokerPosition)
+        private void BeginIdle(Vector2 jokerPosition, Vector3 playScale)
         {
             _introComplete = true;
             _playButton.interactable = true;
-            DOTween.To(() => _joker.anchoredPosition,
+            _jokerIdleTween = DOTween.To(() => _joker.anchoredPosition,
                     position => _joker.anchoredPosition = position,
                     jokerPosition + Vector2.up * 8.0f,
                     1.6f)
                 .SetEase(Ease.InOutSine)
                 .SetLoops(-1, LoopType.Yoyo);
-            DOTween.To(() => _playButtonTransform.anchoredPosition,
-                    position => _playButtonTransform.anchoredPosition = position,
-                    playPosition + Vector2.up * 3.0f,
-                    1.4f)
+            _playIdleTween = _playButtonTransform.DOScale(playScale * 1.02f, 2.8f)
                 .SetEase(Ease.InOutSine)
                 .SetLoops(-1, LoopType.Yoyo);
         }
@@ -170,12 +181,14 @@ namespace Gazeus.DesafioMatch3.Controllers
             }
 
             _introSequence?.Kill();
+            _jokerIdleTween?.Kill();
+            _playIdleTween?.Kill();
             _joker.DOKill();
             _playButtonTransform.DOKill();
             _title.DOKill();
             _titleCanvasGroup.alpha = 1.0f;
             _playButtonCanvasGroup.alpha = 1.0f;
-            BeginIdle(_playButtonTransform.anchoredPosition, _joker.anchoredPosition);
+            BeginIdle(_joker.anchoredPosition, _playButtonTransform.localScale);
         }
 
         private static Tween Fade(CanvasGroup canvasGroup, float endValue, float duration)
