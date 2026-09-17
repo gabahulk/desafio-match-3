@@ -12,7 +12,9 @@ Built with **Unity 6000.3.16f1**.
 
 ## Quick look
 
-![Gameplay demo](demo.gif)
+<p align="center">
+  <img src="demo.gif" alt="Gameplay demo" />
+</p>
 
 ---
 
