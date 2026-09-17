@@ -97,7 +97,7 @@ namespace Gazeus.DesafioMatch3.Controllers
             _overlay.raycastTarget = true;
 
             _joker = menuJoker;
-            _joker.SetParent(root, true);
+            _joker.SetParent(root, false);
             _joker.GetComponent<Image>().raycastTarget = false;
         }
 
