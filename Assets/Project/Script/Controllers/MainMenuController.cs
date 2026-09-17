@@ -1,7 +1,6 @@
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Gazeus.DesafioMatch3.Controllers
@@ -27,6 +26,7 @@ namespace Gazeus.DesafioMatch3.Controllers
         };
 
         private bool _introComplete;
+        private bool _isTransitioning;
         private bool _hasStarted;
         private Sequence _introSequence;
 
@@ -52,10 +52,26 @@ namespace Gazeus.DesafioMatch3.Controllers
 
         public void Play()
         {
-            if (_introComplete)
+            if (!_introComplete || _isTransitioning)
             {
-                SceneManager.LoadScene("Gameplay");
+                return;
             }
+
+            _isTransitioning = true;
+            _playButton.interactable = false;
+            _introSequence?.Kill();
+            _joker.DOKill();
+            _playButtonTransform.DOKill();
+            _title.DOKill();
+
+            MenuGameplayTransition.Begin(
+                (RectTransform)transform,
+                _suits,
+                _joker,
+                _title,
+                _titleCanvasGroup,
+                _playButtonTransform,
+                _playButtonCanvasGroup);
         }
 
         private void PlayIntro()
@@ -147,7 +163,7 @@ namespace Gazeus.DesafioMatch3.Controllers
 
         private void OnLayoutChanged()
         {
-            if (!_hasStarted)
+            if (!_hasStarted || _isTransitioning)
             {
                 return;
             }
