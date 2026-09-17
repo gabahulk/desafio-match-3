@@ -78,7 +78,7 @@ namespace Gazeus.DesafioMatch3.Controllers
             Sequence sequence = DOTween.Sequence();
             _boardView.ApplySpecialTransformations(boardSequence.TransformedSpecialTiles);
             sequence.Append(_boardView.PlaySpecialActivations(boardSequence.SpecialActivations));
-            sequence.AppendCallback(() => TriggerScoreFeedback(boardSequence));
+            sequence.AppendCallback(() => TriggerScoreFeedback(boardSequence, index));
             sequence.Append(_boardView.DestroyTiles(boardSequence.MatchedPositions));
             _boardView.ApplyCreatedSpecials(boardSequence.CreatedSpecialTiles);
             sequence.Append(_boardView.MoveTiles(boardSequence.MovedTiles));
@@ -98,10 +98,11 @@ namespace Gazeus.DesafioMatch3.Controllers
             };
         }
 
-        private void TriggerScoreFeedback(BoardSequence boardSequence)
+        private void TriggerScoreFeedback(BoardSequence boardSequence, int cascadeIndex)
         {
             if (boardSequence.ScoreGained > 0)
             {
+                AudioManager.Instance?.PlayScoreGain(1.0f + Mathf.Min(cascadeIndex, 4) * 0.06f);
                 _scoreView.ShowScoreFeedback(
                     boardSequence.ScoreGained,
                     boardSequence.TotalScore,
@@ -127,6 +128,7 @@ namespace Gazeus.DesafioMatch3.Controllers
                 else
                 {
                     _isAnimating = true;
+                    AudioManager.Instance?.PlaySwap();
                     _boardView.SwapTiles(_selectedX, _selectedY, x, y).onComplete += () =>
                     {
                         MoveResult result = _gameService.TrySwap(_selectedX, _selectedY, x, y);
@@ -136,6 +138,7 @@ namespace Gazeus.DesafioMatch3.Controllers
                         }
                         else
                         {
+                            AudioManager.Instance?.PlayInvalidSwap();
                             _boardView.SwapTiles(x, y, _selectedX, _selectedY).onComplete += () => _isAnimating = false;
                         }
                         _selectedX = -1;

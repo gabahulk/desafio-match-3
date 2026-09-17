@@ -63,6 +63,7 @@ namespace Gazeus.DesafioMatch3.Controllers
             _joker.DOKill();
             _playButtonTransform.DOKill();
             _title.DOKill();
+            AudioManager.Instance?.PlayButtonClick();
 
             MenuGameplayTransition.Begin(
                 (RectTransform)transform,

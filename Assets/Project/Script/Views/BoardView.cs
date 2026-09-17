@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using Gazeus.DesafioMatch3.Controllers;
 using Gazeus.DesafioMatch3.Models;
 using Gazeus.DesafioMatch3.ScriptableObjects;
 using UnityEngine;
@@ -84,12 +85,21 @@ namespace Gazeus.DesafioMatch3.Views
                 sequence.Join(spawn);
             }
 
+            if (addedTiles.Count > 0)
+            {
+                sequence.OnComplete(() => AudioManager.Instance?.PlayLanding());
+            }
+
             return sequence;
         }
 
         public void ApplyCreatedSpecials(List<SpecialTileInfo> createdSpecialTiles)
         {
             ApplySpecialVisuals(createdSpecialTiles);
+            if (createdSpecialTiles.Count > 0)
+            {
+                AudioManager.Instance?.PlaySpecialCreated();
+            }
         }
 
         public void ApplySpecialTransformations(List<SpecialTileInfo> transformedSpecialTiles)
@@ -116,6 +126,11 @@ namespace Gazeus.DesafioMatch3.Views
         public Tween DestroyTiles(List<Vector2Int> matchedPositions)
         {
             Sequence sequence = DOTween.Sequence();
+            if (matchedPositions.Count > 0)
+            {
+                AudioManager.Instance?.PlayMatchPop();
+            }
+
             for (int i = 0; i < matchedPositions.Count; i++)
             {
                 Vector2Int position = matchedPositions[i];
@@ -154,6 +169,11 @@ namespace Gazeus.DesafioMatch3.Views
         public Tween PlaySpecialActivations(List<SpecialActivationInfo> activations)
         {
             Sequence sequence = DOTween.Sequence();
+            if (activations.Count > 0)
+            {
+                AudioManager.Instance?.PlaySpecialActivated();
+            }
+
             for (int index = 0; index < activations.Count; index++)
             {
                 SpecialActivationInfo activation = activations[index];

@@ -1146,6 +1146,64 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1672323832}
   m_CullTransparentMesh: 1
+--- !u!1 &1900158606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1900158608}
+  - component: {fileID: 1900158607}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1900158607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900158606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f9170113e7d45d6b8ce1f53d11a2b1d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: DesafioMatch3::Gazeus.DesafioMatch3.Controllers.AudioManager
+  _swap: {fileID: 8300000, guid: 50e738df72c9f52469d67c9aabf467bc, type: 3}
+  _invalidSwap: {fileID: 8300000, guid: 366c5e8701a8063479f5fdf6c36ef1a1, type: 3}
+  _landing: {fileID: 8300000, guid: 7873902298268b34f813790aa946beb2, type: 3}
+  _matchPops:
+  - {fileID: 8300000, guid: 235a704902bf66442bd27a9ffa20d2ca, type: 3}
+  - {fileID: 8300000, guid: 60153d825e76d244081641a2dd639eab, type: 3}
+  - {fileID: 8300000, guid: 8c9317125861212468cd1cad731eb038, type: 3}
+  _specialCreated: {fileID: 8300000, guid: f427b974b8c2313439fa932ef7ffd5d6, type: 3}
+  _specialActivated: {fileID: 8300000, guid: 87d9e1f32687c8b4d845b51516917677, type: 3}
+  _scoreGain: {fileID: 8300000, guid: b59e35489e2159d44a383cb559201c29, type: 3}
+  _buttonClick: {fileID: 8300000, guid: 96e8109d732fa964d9c628edc90cc29c, type: 3}
+  _sfxVolume: 0.65
+  _gameplayMusic: {fileID: 8300000, guid: 26ee9cee1ae967b43a931a95c7cac8a6, type: 3}
+  _musicVolume: 0.25
+--- !u!4 &1900158608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900158606}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1964584462
 GameObject:
   m_ObjectHideFlags: 0
@@ -1322,3 +1380,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 285695131}
   - {fileID: 1652608799}
+  - {fileID: 1900158608}
