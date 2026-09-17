@@ -12,18 +12,7 @@ Built with **Unity 6000.3.16f1**.
 
 ## Quick look
 
-<!--
-Replace this section with the final 15-30 second gameplay video.
-
-Suggested demo:
-normal match
--> special creation
--> special activation
--> chain/cascade
--> score feedback
--->
-
-**Gameplay video coming here**
+![Gameplay demo](demo.gif)
 
 ---
 
